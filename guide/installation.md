@@ -1,30 +1,200 @@
 # Installation & Setup
 
-OpenKoi is zero-config by design. It ships as a single static binary. 
+OpenKoi ships as a single static binary with zero runtime dependencies. No Node.js, no Python, no Docker. Install it and start working in under 60 seconds.
 
-## Install via Cargo
+## Installation Methods
+
+### Cargo (Source Build)
 
 ```bash
 cargo install openkoi
 ```
 
-## Quick Start (Zero Config)
+Requires a Rust toolchain (1.75+). Builds from source on crates.io.
 
-OpenKoi automatically discovers your API keys from existing tools and environment variables. You don't need a config file to start:
+### Shell Installer
+
+Auto-detects your platform and downloads the correct pre-built binary:
 
 ```bash
-openkoi "Refactor the auth logic to use JWT"
+curl -fsSL https://openkoi.dev/install.sh | sh
 ```
+
+Supports Linux (x86_64, ARM64), macOS (Intel, Apple Silicon), and Windows (x86_64).
+
+## Quick Start (Zero Config)
+
+OpenKoi is designed for zero-config startup. If you have any supported API key in your environment, it just works:
+
+```bash
+# Run a task immediately
+openkoi "Refactor the auth logic to use JWT"
+
+# Start an interactive session
+openkoi chat
+
+# Check what OpenKoi detected
+openkoi status
+```
+
+No config file needed. No setup wizard. No account creation.
 
 ## Credential Discovery
 
-On first run, OpenKoi scans for existing credentials in this priority order:
-1. **Environment Variables**: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, etc.
-2. **External CLI Credentials**: Auto-imports keys from the Claude CLI, OpenAI Codex, etc.
-3. **Local Probes**: Detects if an **Ollama** instance is running at `localhost:11434`.
+On startup, OpenKoi automatically scans for credentials in this priority order:
 
-If no keys are found, a minimal interactive picker will help you set one up in seconds.
+### 1. Environment Variables
+
+The fastest path. Set any of these:
+
+```bash
+# Anthropic (highest default priority)
+export ANTHROPIC_API_KEY="sk-ant-..."
+
+# OpenAI
+export OPENAI_API_KEY="sk-..."
+
+# Google
+export GOOGLE_API_KEY="AIza..."
+
+# AWS Bedrock
+export AWS_ACCESS_KEY_ID="AKIA..."
+export AWS_SECRET_ACCESS_KEY="..."
+export AWS_REGION="us-east-1"              # optional, defaults to us-east-1
+export BEDROCK_DEFAULT_MODEL="..."         # optional
+
+# OpenAI-compatible endpoints
+export OPENAI_COMPAT_API_KEY="..."
+export OPENAI_COMPAT_BASE_URL="https://your-endpoint.com/v1"
+```
+
+### 2. External CLI Credentials
+
+OpenKoi auto-imports keys from existing tools you already use:
+
+- **Claude CLI** — Reads credentials from `~/.claude/` config
+- **OpenAI Codex** — Reads credentials from OpenAI CLI config
+- Other tools that store API keys in standard locations
+
+### 3. Local Probes
+
+OpenKoi probes for locally running model servers:
+
+- **Ollama** — Checks `localhost:11434` for a running instance
+- Detected automatically, no configuration needed
+
+### 4. Interactive Picker
+
+If no credentials are found anywhere, OpenKoi shows a minimal interactive picker:
+
+```
+No API keys detected. Choose a provider to set up:
+
+  1. Anthropic (Claude)
+  2. OpenAI (GPT)
+  3. Google (Gemini)
+  4. Ollama (local, free)
+
+Enter choice:
+```
+
+## Default Model Selection
+
+When multiple providers are available, OpenKoi selects the default model in this priority order:
+
+1. **Claude Sonnet 4.5** (Anthropic) — Best overall quality
+2. **GPT-5.2** (OpenAI)
+3. **Gemini 2.5 Pro** (Google)
+4. **Claude Sonnet 4.5** (Bedrock) — Same model via AWS
+5. **llama3.3** (Ollama) — Free, local
+
+You can override this in `config.toml` or per-task with `--model`.
 
 ## Manual Configuration
 
-While not required, you can manage your preferences in `~/.openkoi/config.toml`.
+While not required, you can customize OpenKoi via `~/.openkoi/config.toml`:
+
+```toml
+[provider]
+default_model = "claude-sonnet-4-5-20250514"
+
+[provider.roles]
+executor = "claude-sonnet-4-5-20250514"
+evaluator = "gpt-5.2"
+planner = "claude-sonnet-4-5-20250514"
+embedder = "text-embedding-3-small"
+
+[iteration]
+max_iterations = 5
+confidence_threshold = 0.85
+
+[soul]
+enabled = true
+formality = 0.7
+verbosity = 0.4
+```
+
+See [Configuration Reference](/guide/configuration) for the full list of options.
+
+## Verifying Installation
+
+After installing, verify everything works:
+
+```bash
+# Check version
+openkoi --version
+
+# Run diagnostics
+openkoi doctor
+```
+
+The `doctor` command checks:
+- Binary integrity
+- Detected providers and API keys
+- SQLite database health
+- File permissions on credential stores
+- MCP server connectivity
+- Plugin system status
+
+## Self-Update
+
+OpenKoi can update itself:
+
+```bash
+# Check for updates
+openkoi update --check
+
+# Update to latest version
+openkoi update
+```
+
+OpenKoi checks for updates once per day on startup. If a new version is available, it shows a one-line hint — it never auto-updates.
+
+## Versioning
+
+OpenKoi uses **CalVer** format: `YYYY.M.D` (e.g., `2026.2.18`). Pre-releases use `YYYY.M.D-beta.N`. This matches the OpenClaw versioning scheme.
+
+## Directory Structure
+
+After first run, OpenKoi creates:
+
+```
+~/.openkoi/
+├── config.toml          # User configuration
+├── openkoi.db           # SQLite database (memory, sessions, learnings)
+├── skills/
+│   ├── user/            # Your custom skills
+│   └── proposed/        # Auto-proposed skills (need approval)
+├── evaluators/
+│   └── user/            # Your custom evaluators
+├── plugins/
+│   ├── wasm/            # WASM plugin binaries
+│   └── rhai/            # Rhai script plugins
+└── soul.toml            # Soul personality state
+```
+
+## Next Steps
+
+- [CLI Reference](/guide/cli-reference) — All commands, flags, and REPL commands
+- [Providers](/guide/providers) — Configure and assign models per role
+- [Configuration](/guide/configuration) — Full `config.toml` reference

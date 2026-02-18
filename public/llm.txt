@@ -1,30 +1,137 @@
-# OpenKoi: Self-Iterating AI Agent System
+# OpenKoi — Self-Iterating AI Agent System
 
-OpenKoi is a standalone, CLI-first AI agent platform written in Rust. It is designed to iterate on its own output, evaluate results, and learn from usage patterns.
-
-## Core Principles
-1. **Single Binary**: No runtime dependencies. `cargo install openkoi`.
-2. **Self-Iteration**: Plan -> Execute -> Evaluate -> Refine.
-3. **Local-First**: Persistent local memory and skill registry.
-4. **OpenClaw Compatible**: Supports OpenClaw skill format and MCP (Model Context Protocol).
-
-## CLI Quick Reference
-- `openkoi "task"`: Run a task with default 3 iterations.
-- `openkoi chat`: Interactive REPL.
-- `openkoi learn`: Review proposed skills from usage patterns.
-- `openkoi status`: Show costs, memory, and active models.
-
-## Technology Stack
-- **Language**: Rust (Tokio, Clap, Reqwest, SQLite).
-- **Plugins**: WASM, Rhai scripting.
-- **Tools**: MCP subprocesses.
-
-## Compatibility
-- **Skills**: Fully compatible with OpenClaw `.SKILL.md` format.
-- **Provider Layer**: Supports Anthropic, OpenAI, Google, Ollama.
-
-## GitHub
-https://github.com/openkoi/openkoi
+OpenKoi is a standalone, CLI-first AI agent platform written in Rust. It iterates on its own output using a Plan-Execute-Evaluate-Refine cycle, evaluates results against rubrics, learns from daily usage patterns, and integrates with external apps. Ships as a single static binary with zero runtime dependencies.
 
 ## License
-Apache License 2.0
+MIT License
+
+## Repository
+https://github.com/openkoi-ai/openkoi
+
+## Website
+https://openkoi.ai
+
+## Core Design Principles
+1. Single binary — `cargo install openkoi`. No Node, Python, or Docker. ~20MB static binary.
+2. Token-frugal — Context compression, evaluation caching, diff-patch instead of regeneration.
+3. Zero-config — `openkoi "task"` works immediately. Detects API keys from environment.
+4. Local-first — All data on-device in SQLite. No cloud requirement.
+5. Model-agnostic — Anthropic, OpenAI, Google, Ollama, AWS Bedrock, any OpenAI-compatible endpoint.
+6. Learn from use — Observes patterns, proposes new skills to automate recurring workflows.
+7. Iterate to quality — Agent is its own reviewer. Stops when quality threshold is met.
+8. Extensible — WASM plugins, Rhai scripts, MCP for external tools.
+
+## Supported Providers
+- Anthropic (Claude Sonnet 4.5, Claude Haiku) — ANTHROPIC_API_KEY
+- OpenAI (GPT-5.2, GPT-4.1) — OPENAI_API_KEY
+- Google (Gemini 2.5 Pro, Gemini 2.0 Flash) — GOOGLE_API_KEY
+- Ollama (llama3.3, any local model) — auto-detected at localhost:11434
+- AWS Bedrock (Claude, Llama via AWS) — AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY
+- Any OpenAI-compatible endpoint — OPENAI_COMPAT_API_KEY + OPENAI_COMPAT_BASE_URL
+
+## Role-Based Model Assignment
+- Executor — does the work
+- Evaluator — judges the output
+- Planner — plans strategy
+- Embedder — generates vector embeddings
+Different models can be assigned to each role. Smart default: same model for all roles.
+
+## CLI Quick Reference
+- `openkoi "task"` — Run a task (default 3 iterations)
+- `openkoi chat` — Interactive REPL session
+- `openkoi learn` — Review proposed skills from pattern mining
+- `openkoi learn --approve <name>` — Approve a proposed skill
+- `openkoi status` — Show costs, memory, active models, integrations
+- `openkoi doctor` — Run diagnostics (providers, MCP, permissions, DB health)
+- `openkoi connect <app>` — Connect an integration (Slack, GitHub, Jira, etc.)
+- `openkoi export <type>` — Export data (learnings, sessions, patterns, all) as JSON or YAML
+- `openkoi migrate` — Show/run database migrations
+- `openkoi update` — Self-update from GitHub releases
+- `openkoi update --check` — Check for new versions without updating
+
+## REPL Slash Commands (in chat mode)
+- /status — Show iteration stats
+- /model <name> — Switch model mid-session
+- /compact — Compress context to reclaim tokens
+- /save — Persist session to memory
+- /skill <name> — Load a skill by name
+- /undo — Revert last agent action
+- /eval — Force re-evaluation of last output
+- /help — List all commands
+
+## Skill System
+- OpenClaw-compatible .SKILL.md format (YAML frontmatter + Markdown body)
+- Two kinds: task skills and evaluator skills (rubrics)
+- Six sources with clear precedence: Bundled < Managed < OpenClaw < Workspace < User < Proposed
+- Three-level progressive loading to minimize token usage
+- Pattern mining auto-proposes new skills from usage patterns
+- Skills require OS match, binary availability, and env var checks
+
+## Plugin System (Three Tiers)
+1. MCP (Model Context Protocol) — External tool servers via JSON-RPC (stdio or SSE transport)
+2. WASM — Sandboxed high-performance plugins with capability manifests
+3. Rhai — Lightweight scripting for quick customization and hooks
+
+## MCP Integration
+- Auto-discovers servers from .mcp.json (Claude Code / VS Code compatible)
+- Global config at ~/.config/mcp/servers.json
+- Explicit config in config.toml
+- Tool namespacing: server__tool_name to prevent collisions
+- Supports tools/list, tools/call, resources/list, resources/read, prompts/list, prompts/get
+- Process isolation per server
+
+## Memory & Learning
+- SQLite database at ~/.openkoi/openkoi.db
+- Three memory layers: working (session), episodic (cross-session), semantic (vector embeddings)
+- sqlite-vec for vector similarity search
+- Memory compaction and decay over time
+- Session transcripts preserved for learning
+
+## Integrations (10 Built-in)
+- Slack — Messaging and channel search
+- Discord — Messaging and channel history
+- Microsoft Teams — Messaging via Graph API
+- GitHub — Issues, PRs, code search
+- Jira — Issue tracking and transitions
+- Linear — Issue management
+- Notion — Document reading and writing
+- Google Docs — Document operations
+- Telegram — Messaging
+- Email (SMTP) — Send notifications
+
+Each integration exposes dual adapters (messaging + document) as MCP-compatible tools.
+
+## Evaluator System
+- Two-layer architecture: bundled evaluators + custom evaluator skills
+- Incremental evaluation (diffs only, not full re-evaluation)
+- Evaluation caching to avoid redundant checks
+- Confidence-based early stopping
+
+## Soul System (Optional)
+- Personality traits: formality, verbosity, emoji usage, technical depth
+- Evolves based on feedback and interaction patterns
+- Persisted locally in soul.toml
+- Fully optional — works without it
+
+## Security
+- File permission auditing (chmod 600/700 for credentials)
+- WASM sandbox with capability manifests
+- MCP process isolation
+- Trust levels for different operation types
+- No data leaves the machine (except model API calls)
+
+## Architecture
+- Rust with Tokio async runtime
+- SQLite via rusqlite (with sqlite-vec for embeddings)
+- reqwest for HTTP, reqwest-eventsource for SSE streaming
+- clap for CLI parsing
+- serde for serialization
+- Modular: provider/, memory/, integrations/, plugins/, security/, cli/
+
+## Installation
+- cargo install openkoi
+- curl -fsSL https://openkoi.dev/install.sh | sh
+- GitHub Releases (pre-built for Linux/macOS/Windows, x86_64/ARM64)
+
+## Versioning
+CalVer: YYYY.M.D (matches OpenClaw versioning)
