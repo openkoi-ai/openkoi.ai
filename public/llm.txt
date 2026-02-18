@@ -1,0 +1,30 @@
+# OpenKoi: Self-Iterating AI Agent System
+
+OpenKoi is a standalone, CLI-first AI agent platform written in Rust. It is designed to iterate on its own output, evaluate results, and learn from usage patterns.
+
+## Core Principles
+1. **Single Binary**: No runtime dependencies. `cargo install openkoi`.
+2. **Self-Iteration**: Plan -> Execute -> Evaluate -> Refine.
+3. **Local-First**: Persistent local memory and skill registry.
+4. **OpenClaw Compatible**: Supports OpenClaw skill format and MCP (Model Context Protocol).
+
+## CLI Quick Reference
+- `openkoi "task"`: Run a task with default 3 iterations.
+- `openkoi chat`: Interactive REPL.
+- `openkoi learn`: Review proposed skills from usage patterns.
+- `openkoi status`: Show costs, memory, and active models.
+
+## Technology Stack
+- **Language**: Rust (Tokio, Clap, Reqwest, SQLite).
+- **Plugins**: WASM, Rhai scripting.
+- **Tools**: MCP subprocesses.
+
+## Compatibility
+- **Skills**: Fully compatible with OpenClaw `.SKILL.md` format.
+- **Provider Layer**: Supports Anthropic, OpenAI, Google, Ollama.
+
+## GitHub
+https://github.com/openkoi/openkoi
+
+## License
+Apache License 2.0
