@@ -482,7 +482,7 @@ fn test_orchestrator() {
 | Live tests | `LIVE=1 cargo test` | Nightly only (not on every PR). |
 | Snapshot review | `cargo insta review` | Manual approval for snapshot changes. |
 
-CI matrix: `ubuntu-latest`, `macos-latest`, `windows-latest`.
+CI matrix: `ubuntu-latest`, `macos-latest`.
 
 ## Distribution
 
@@ -496,13 +496,12 @@ OpenKoi ships as a single static binary. No runtime dependencies, no package man
 | Linux ARM64 | `aarch64-unknown-linux-musl` | Raspberry Pi, AWS Graviton, Oracle Ampere. |
 | macOS x86_64 | `x86_64-apple-darwin` | Intel Macs. |
 | macOS ARM64 | `aarch64-apple-darwin` | Apple Silicon (M1/M2/M3/M4). |
-| Windows x86_64 | `x86_64-pc-windows-msvc` | Native Windows. |
 
 ### Distribution Channels
 
 | Channel | Command | Notes |
 |---------|---------|-------|
-| **cargo install** | `cargo install openkoi` | Source build. Works on any platform with a Rust toolchain. |
+| **cargo install** | `cargo install openkoi` | Source build. Works on Linux and macOS with a Rust toolchain. |
 | **Shell installer** | `curl -fsSL https://openkoi.dev/install.sh \| sh` | Detects OS/arch, downloads the correct binary. |
 | **GitHub Releases** | Download from releases page | Pre-built binaries. SHA256 checksums included. |
 

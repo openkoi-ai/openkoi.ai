@@ -39,7 +39,7 @@ This skill handles migration from session-based auth to JWT...
 | `name` | Yes | Unique identifier (kebab-case) |
 | `description` | Yes | One-line summary for the system prompt |
 | `kind` | No | `task` (default) or `evaluator` |
-| `metadata.os` | No | Target OS list: `linux`, `macos`, `windows` |
+| `metadata.os` | No | Target OS list: `linux`, `macos` |
 | `metadata.requires_binaries` | No | Binaries that must be on `$PATH` |
 | `metadata.requires_env` | No | Environment variables that must be set |
 | `metadata.category` | No | Grouping label for organization |

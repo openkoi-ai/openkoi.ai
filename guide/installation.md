@@ -20,7 +20,7 @@ Auto-detects your platform and downloads the correct pre-built binary:
 curl -fsSL https://openkoi.dev/install.sh | sh
 ```
 
-Supports Linux (x86_64, ARM64), macOS (Intel, Apple Silicon), and Windows (x86_64).
+Supports Linux (x86_64, ARM64) and macOS (Intel, Apple Silicon).
 
 ## Quick Start (Zero Config)
 
