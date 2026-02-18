@@ -1,21 +1,27 @@
 # MCP Integration
 
-Model Context Protocol (MCP) is at the heart of OpenKoi's tool usage. It allows the agent to safely control your local environment and connect to external data sources.
+Model Context Protocol (MCP) is at the heart of OpenKoi's tool usage. It provides a standardized way for the agent to safely interact with your local environment and external data sources.
 
-## How it works
+## Secure Tool Execution
 
-Whether it's reading a local database, searching your file system, or interacting with a browser, OpenKoi leverages MCP subprocesses to get the job done without complex configuration.
+OpenKoi leverages MCP subprocesses to execute tools. This ensures:
+- **Isolation**: Each tool runs in its own process.
+- **Security**: The agent only has access to the tools you've explicitly connected.
+- **Ease of Use**: No complex configuration for new tools—just connect and go.
 
-## Connect an App
+## Application Integration
 
-Run the following command to link your favorite workspace tools directly to the orchestrator:
+OpenKoi can integrate with various workplace applications:
+- **Slack/Discord/Telegram**: For collaborative task execution.
+- **Notion/Google Docs**: For document reading and writing.
+- **Local Databases**: For data analysis and reporting.
+
+## Connecting Tools
+
+To link a new application or tool set, use the `connect` command:
 
 ```bash
 openkoi connect slack
 ```
 
-## Features
-
-- **Standardized Communication**: Interact with any MCP-compliant server.
-- **Secure Access**: OpenKoi manages handles to external tools via secure subprocesses.
-- **Rich Context**: Provide the agent with the exact data it needs to perform complex tasks.
+This will guide you through the one-time authentication process and register the Slack MCP server with your local orchestrator.

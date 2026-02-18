@@ -2,10 +2,22 @@
 
 OpenKoi is a high-performance, self-iterating AI agent system. Unlike traditional agents that "fire and forget," OpenKoi follows a rigorous **Plan-Execute-Evaluate-Refine** cycle.
 
-Built with **Rust** for maximum speed (< 10ms startup) and safety, it acts as a local orchestrator that manages your tasks with a level of precision previously reserved for human developers.
+## Design Principles
 
-The core philosophy is inspired by **Tai Chi**: the fluid balance between the creative, probabilistic intelligence of LLMs and the rigid, deterministic execution of system-level code.
+| Principle | Rationale |
+|-----------|-----------|
+| **Single binary** | `cargo install openkoi`. No Node, no Python, no runtime deps (~20MB binary). |
+| **Token-frugal** | Context compression, evaluation caching, and diff-patch logic to save cost. |
+| **Zero-config** | `openkoi "task"` works immediately by detecting API keys from your environment. |
+| **Local-first** | All data stays on-device in SQLite and standard files. No cloud requirement. |
+| **Iterate to quality** | The agent is its own reviewer. It only stops when the task meets your standards. |
 
-## The Engine of Certainty
+## Why Rust?
 
-OpenKoi doesn't just guess. It iterates. It evaluates its own output against rubrics and refines until quality thresholds are met.
+OpenKoi is built with Rust to provide a premium CLI experience:
+- **Startup**: < 10ms (TypeScript CLI tools often take 200ms+).
+- **Memory**: ~5MB idle (Node.js idles at 50-100MB).
+- **Correctness**: Memory safety and strict typing for reliable background operations.
+
+## The Soul System
+OpenKoi includes an optional "Soul System" that tracks personality traits, preferences, and interaction styles to provide a more personalized agent experience over time.
