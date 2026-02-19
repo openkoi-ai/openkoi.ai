@@ -41,6 +41,7 @@ All credentials are stored under `~/.openkoi/credentials/` using plain files pro
 
 ```
 ~/.openkoi/
+  auth.json                       # OAuth tokens for GitHub Copilot, ChatGPT (chmod 600)
   credentials/                    # chmod 700 (rwx------)
     providers.json                # API keys for model providers (chmod 600)
     integrations.json             # OAuth tokens for Slack, Notion, etc. (chmod 600)
@@ -53,6 +54,7 @@ All credentials are stored under `~/.openkoi/credentials/` using plain files pro
 
 | Path | Permission | Meaning |
 |------|-----------|---------|
+| `~/.openkoi/auth.json` | `chmod 600` (`rw-------`) | Only the owner can read or write. Contains OAuth refresh tokens. |
 | `~/.openkoi/credentials/` | `chmod 700` (`rwx------`) | Only the owner can list or enter the directory. |
 | `*.key` files | `chmod 600` (`rw-------`) | Only the owner can read or write. |
 | `providers.json` | `chmod 600` (`rw-------`) | Only the owner can read or write. |
@@ -125,7 +127,7 @@ OpenKoi provides two functions for programmatic permission repair:
 | Function | Scope | Behavior |
 |----------|-------|----------|
 | `fix_permissions(path)` | Single file or directory | Sets the correct mode for the given path. |
-| `fix_all_permissions()` | Entire credentials directory | Walks `~/.openkoi/credentials/` and fixes every file and the directory itself. |
+| `fix_all_permissions()` | Entire credentials directory + auth.json | Walks `~/.openkoi/credentials/` and checks `~/.openkoi/auth.json`, fixing permissions on every file and the directory itself. |
 
 Both functions log what they changed so the user has a clear audit trail.
 

@@ -1,6 +1,6 @@
 # CLI Reference
 
-OpenKoi ships as a single binary with a small, focused command surface. Five primary commands cover all use cases, with flags and REPL slash commands for progressive control.
+OpenKoi ships as a single binary with a small, focused command surface. Primary commands cover all use cases, with flags and REPL slash commands for progressive control.
 
 ## Command Overview
 
@@ -11,7 +11,8 @@ OpenKoi ships as a single binary with a small, focused command surface. Five pri
 | `openkoi learn` | Review learned patterns and proposed skills |
 | `openkoi status` | Show memory, skills, integrations, and costs |
 | `openkoi init` | First-time setup wizard |
-| `openkoi connect <app>` | Set up an app integration |
+| `openkoi connect <provider>` | Authenticate with an OAuth provider or set up an integration |
+| `openkoi disconnect <provider>` | Remove stored credentials for a provider |
 | `openkoi daemon <action>` | Manage the background daemon |
 | `openkoi doctor` | Run diagnostics on the system |
 | `openkoi update` | Update to the latest version |
@@ -220,9 +221,34 @@ The wizard walks through:
 
 ---
 
-## `openkoi connect <app>`
+## `openkoi connect <provider>`
 
-Set up an integration with an external application.
+Authenticate with a subscription-based provider via OAuth device-code flow, or set up an integration with an external application.
+
+### OAuth Providers
+
+```bash
+# Subscription providers (device-code flow, no API key needed)
+openkoi connect copilot     # GitHub Copilot
+openkoi connect chatgpt     # ChatGPT Plus/Pro
+
+# Check connection status
+openkoi connect status
+```
+
+For OAuth providers, `connect` initiates a device-code flow: a URL and a short code are displayed, your browser opens, and OpenKoi waits for you to authorize. Tokens are saved to `~/.openkoi/auth.json` and refreshed automatically.
+
+```
+$ openkoi connect copilot
+
+  Visit: https://github.com/login/device
+  Enter code: ABCD-1234
+
+  Waiting for authorization...
+  Connected to GitHub Copilot.
+```
+
+### Integrations
 
 ```bash
 openkoi connect slack
@@ -231,6 +257,21 @@ openkoi connect telegram
 ```
 
 Each integration has its own setup flow (typically entering an API token or OAuth). Once connected, the integration automatically registers tools that the agent can invoke during tasks.
+
+---
+
+## `openkoi disconnect <provider>`
+
+Remove stored credentials for a provider or integration.
+
+```bash
+openkoi disconnect copilot      # Remove GitHub Copilot OAuth token
+openkoi disconnect chatgpt      # Remove ChatGPT OAuth token
+openkoi disconnect anthropic    # Remove saved API key
+openkoi disconnect all          # Remove all OAuth tokens
+```
+
+Disconnecting deletes the stored token or key file. You can reconnect at any time by running `openkoi connect` again.
 
 ---
 

@@ -68,7 +68,16 @@ export OPENAI_COMPAT_API_KEY="..."
 export OPENAI_COMPAT_BASE_URL="https://your-endpoint.com/v1"
 ```
 
-### 2. External CLI Credentials
+### 2. OAuth Store
+
+If you've previously run `openkoi connect`, tokens are loaded from `~/.openkoi/auth.json`:
+
+- **GitHub Copilot** — via `openkoi connect copilot`
+- **ChatGPT Plus/Pro** — via `openkoi connect chatgpt`
+
+Tokens are refreshed automatically before expiry. No API key needed — uses your existing subscription.
+
+### 3. External CLI Credentials
 
 OpenKoi auto-imports keys from existing tools you already use:
 
@@ -76,27 +85,31 @@ OpenKoi auto-imports keys from existing tools you already use:
 - **OpenAI Codex** — Reads credentials from OpenAI CLI config
 - Other tools that store API keys in standard locations
 
-### 3. Local Probes
+### 4. Local Probes
 
 OpenKoi probes for locally running model servers:
 
 - **Ollama** — Checks `localhost:11434` for a running instance
 - Detected automatically, no configuration needed
 
-### 4. Interactive Picker
+### 5. Interactive Picker
 
 If no credentials are found anywhere, OpenKoi shows a minimal interactive picker:
 
 ```
 No API keys detected. Choose a provider to set up:
 
-  1. Anthropic (Claude)
-  2. OpenAI (GPT)
-  3. Google (Gemini)
-  4. Ollama (local, free)
+  1. GitHub Copilot (login with your subscription)
+  2. ChatGPT Plus/Pro (login with your subscription)
+  3. Anthropic (API key)
+  4. OpenAI (API key)
+  5. Google (API key)
+  6. Ollama (local, free)
 
 Enter choice:
 ```
+
+Options 1 and 2 use device-code OAuth — no API key needed. See [Providers](/guide/providers) for details on each provider.
 
 ## Default Model Selection
 
@@ -181,7 +194,10 @@ After first run, OpenKoi creates:
 ```
 ~/.openkoi/
 ├── config.toml          # User configuration
+├── auth.json            # OAuth tokens (GitHub Copilot, ChatGPT)
 ├── openkoi.db           # SQLite database (memory, sessions, learnings)
+├── credentials/
+│   └── <provider>.key   # Saved API keys (chmod 600)
 ├── skills/
 │   ├── user/            # Your custom skills
 │   └── proposed/        # Auto-proposed skills (need approval)

@@ -36,7 +36,65 @@ The `chat` method is used for non-streaming calls (evaluation, planning). The `c
 
 ## Built-in Providers
 
-### Anthropic
+### Subscription-Based (OAuth)
+
+These providers use **device-code OAuth** — you authenticate through your browser using your existing subscription. No API key needed.
+
+#### GitHub Copilot
+
+| Property | Value |
+|----------|-------|
+| **Provider ID** | `github-copilot` |
+| **Auth** | Device-code OAuth (GitHub login) |
+| **Command** | `openkoi connect copilot` |
+| **Default model** | Copilot Chat model |
+| **API** | GitHub Copilot Chat API |
+| **Streaming** | Yes (SSE) |
+| **Embeddings** | No |
+
+Works with any GitHub Copilot subscription (Individual, Business, or Enterprise). When you run `openkoi connect copilot`, OpenKoi displays a device code and opens your browser. Sign in to GitHub, enter the code, and you're connected.
+
+```
+$ openkoi connect copilot
+
+  Visit: https://github.com/login/device
+  Enter code: ABCD-1234
+
+  Waiting for authorization...
+  Connected to GitHub Copilot.
+```
+
+Tokens are stored in `~/.openkoi/auth.json` and refreshed automatically before expiry.
+
+#### ChatGPT (OpenAI)
+
+| Property | Value |
+|----------|-------|
+| **Provider ID** | `openai-oauth` |
+| **Auth** | Device-code OAuth (OpenAI login) |
+| **Command** | `openkoi connect chatgpt` |
+| **Default model** | ChatGPT model |
+| **API** | OpenAI ChatGPT API |
+| **Streaming** | Yes (SSE) |
+| **Embeddings** | No |
+
+Works with ChatGPT Plus or Pro subscriptions. The flow is identical to GitHub Copilot — device code, browser login, done.
+
+```
+$ openkoi connect chatgpt
+
+  Visit: https://login.chatgpt.com/device
+  Enter code: WXYZ-5678
+
+  Waiting for authorization...
+  Connected to ChatGPT.
+```
+
+Tokens are stored in `~/.openkoi/auth.json` alongside any other OAuth tokens.
+
+### API Key Providers
+
+#### Anthropic
 
 | Property | Value |
 |----------|-------|
@@ -47,9 +105,9 @@ The `chat` method is used for non-streaming calls (evaluation, planning). The `c
 | **Streaming** | Yes (SSE) |
 | **Embeddings** | No (use OpenAI embedder) |
 
-Anthropic is the highest-priority provider when auto-detecting. OpenKoi uses Anthropic's **prompt caching** feature to reduce costs on repeated system prompts across iterations within a session.
+Anthropic is the highest-priority API key provider when auto-detecting. OpenKoi uses Anthropic's **prompt caching** feature to reduce costs on repeated system prompts across iterations within a session.
 
-#### Prompt Caching
+##### Prompt Caching
 
 The system prompt (soul + task context + skill descriptions) is marked with `cache_control: Ephemeral`. This tells Anthropic to cache the system prompt across consecutive API calls, saving approximately 90% of input tokens on the system prompt portion.
 
@@ -63,7 +121,7 @@ SystemBlock {
 
 Prompt caching is automatic and requires no configuration. It only applies to the Anthropic provider.
 
-#### Credential Sources
+##### Credential Sources
 
 Anthropic keys can come from multiple sources (checked in order):
 
@@ -72,7 +130,7 @@ Anthropic keys can come from multiple sources (checked in order):
 3. macOS Keychain entry `Claude Code-credentials`
 4. Saved credentials at `~/.openkoi/credentials/anthropic.key`
 
-### OpenAI
+#### OpenAI
 
 | Property | Value |
 |----------|-------|
@@ -83,15 +141,15 @@ Anthropic keys can come from multiple sources (checked in order):
 | **Streaming** | Yes (SSE) |
 | **Embeddings** | Yes (`text-embedding-3-small`) |
 
-OpenAI is the second-priority provider. It also serves as the default embedder -- `openai/text-embedding-3-small` is used for vector embeddings unless overridden.
+OpenAI is the second-priority API key provider. It also serves as the default embedder -- `openai/text-embedding-3-small` is used for vector embeddings unless overridden.
 
-#### Credential Sources
+##### Credential Sources
 
 1. `OPENAI_API_KEY` environment variable
 2. OpenAI Codex CLI credentials
 3. Saved credentials at `~/.openkoi/credentials/openai.key`
 
-### Google
+#### Google
 
 | Property | Value |
 |----------|-------|
@@ -104,7 +162,9 @@ OpenAI is the second-priority provider. It also serves as the default embedder -
 
 Google is the third-priority provider in auto-detection.
 
-### Ollama
+### Local Providers
+
+#### Ollama
 
 | Property | Value |
 |----------|-------|
@@ -117,7 +177,7 @@ Google is the third-priority provider in auto-detection.
 
 Ollama is the zero-cost, zero-key path. OpenKoi probes `localhost:11434` on startup. If Ollama is running, it queries the available models and selects the best one.
 
-#### Model Priority
+##### Model Priority
 
 When multiple Ollama models are available, OpenKoi picks the best one by quality:
 
@@ -134,7 +194,7 @@ When multiple Ollama models are available, OpenKoi picks the best one by quality
 
 If no models are installed, OpenKoi suggests running `ollama pull llama3.3`.
 
-### AWS Bedrock
+#### AWS Bedrock
 
 | Property | Value |
 |----------|-------|
@@ -144,7 +204,7 @@ If no models are installed, OpenKoi suggests running `ollama pull llama3.3`.
 | **Streaming** | Yes |
 | **Embeddings** | Yes (model-dependent) |
 
-#### Required Environment Variables
+##### Required Environment Variables
 
 | Variable | Required | Description |
 |----------|----------|-------------|
@@ -155,7 +215,7 @@ If no models are installed, OpenKoi suggests running `ollama pull llama3.3`.
 
 Bedrock uses **SigV4 signing** for all API requests. OpenKoi handles the signing internally using the standard AWS credential chain.
 
-#### Available Models
+##### Available Models
 
 | Model | Bedrock Model ID |
 |-------|-----------------|
@@ -164,7 +224,7 @@ Bedrock uses **SigV4 signing** for all API requests. OpenKoi handles the signing
 | Amazon Nova Pro | `amazon.nova-pro-v1:0` |
 | Llama 3.3 70B | `meta.llama3-3-70b-instruct-v1:0` |
 
-### OpenAI-Compatible Providers
+#### OpenAI-Compatible Providers
 
 Any provider that implements the OpenAI Chat Completions API can be used. These are configured via environment variables or the config file.
 
@@ -177,7 +237,7 @@ Any provider that implements the OpenAI Chat Completions API can be used. These 
 | **xAI** | `XAI_API_KEY` | `grok-4-0709` | `https://api.x.ai/v1` |
 | **Custom** | User-defined | User-defined | User-defined |
 
-#### Custom Endpoint Configuration
+##### Custom Endpoint Configuration
 
 For a self-hosted or unlisted OpenAI-compatible endpoint, use the provider picker during `openkoi init` and select "Other (OpenAI-compatible URL)", or set it up directly in the config file.
 
@@ -190,14 +250,15 @@ On startup, OpenKoi scans for credentials in the following order. The first matc
 | Priority | Source | Example |
 |----------|--------|---------|
 | 1 | **Environment variables** | `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, etc. |
-| 2 | **Claude CLI credentials** | `~/.claude/.credentials.json` (OAuth token) |
-| 3 | **Claude CLI Keychain** (macOS) | macOS Keychain entry `Claude Code-credentials` |
-| 4 | **OpenAI Codex CLI** | Codex CLI auth credentials |
-| 5 | **Qwen CLI** | `~/.qwen/oauth_creds.json` |
-| 6 | **Saved OpenKoi credentials** | `~/.openkoi/credentials/<provider>.key` |
-| 7 | **Ollama probe** | TCP connection to `localhost:11434` |
+| 2 | **OAuth store** | GitHub Copilot, ChatGPT tokens from `openkoi connect` (`~/.openkoi/auth.json`) |
+| 3 | **Claude CLI credentials** | `~/.claude/.credentials.json` |
+| 4 | **Claude CLI Keychain** (macOS) | macOS Keychain entry `Claude Code-credentials` |
+| 5 | **OpenAI Codex CLI** | Codex CLI auth credentials |
+| 6 | **Qwen CLI** | `~/.qwen/oauth_creds.json` |
+| 7 | **Saved OpenKoi credentials** | `~/.openkoi/credentials/<provider>.key` |
+| 8 | **Ollama probe** | TCP connection to `localhost:11434` |
 
-This means if you already have Claude Code or Codex CLI installed and authenticated, OpenKoi will automatically use those credentials with zero setup.
+This means if you already have Claude Code or Codex CLI installed and authenticated, OpenKoi will automatically use those credentials with zero setup. And if you have a GitHub Copilot or ChatGPT subscription, `openkoi connect` is all you need.
 
 ---
 
@@ -317,6 +378,50 @@ xai/grok-4-0709
 ```
 
 The provider prefix is required to disambiguate models that may share names across providers.
+
+---
+
+## Connect and Disconnect
+
+Use `openkoi connect` to authenticate with subscription-based providers, and `openkoi disconnect` to remove stored credentials.
+
+### Connecting
+
+```bash
+# Subscription providers (OAuth device-code flow)
+openkoi connect copilot     # GitHub Copilot
+openkoi connect chatgpt     # ChatGPT Plus/Pro
+
+# Check connection status for all providers
+openkoi connect status
+```
+
+Each `connect` command initiates a device-code flow: OpenKoi displays a URL and a short code, opens your browser, and waits for you to authorize. Once complete, tokens are saved to `~/.openkoi/auth.json` and refreshed automatically.
+
+### Disconnecting
+
+```bash
+# Remove a specific provider's credentials
+openkoi disconnect copilot      # Remove GitHub Copilot OAuth token
+openkoi disconnect chatgpt      # Remove ChatGPT OAuth token
+openkoi disconnect anthropic    # Remove saved API key
+
+# Remove all OAuth tokens
+openkoi disconnect all
+```
+
+Disconnecting deletes the stored token or key. You can reconnect at any time by running `openkoi connect` again.
+
+### Connection Status
+
+```bash
+$ openkoi connect status
+
+  GitHub Copilot:  connected (token valid, expires in 47m)
+  ChatGPT:         connected (token valid, expires in 2h 13m)
+  Anthropic:       connected (API key from env)
+  Ollama:          connected (localhost:11434, 3 models)
+```
 
 ---
 
