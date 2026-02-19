@@ -17,7 +17,7 @@ Requires a Rust toolchain (1.75+). Builds from source on crates.io.
 Auto-detects your platform and downloads the correct pre-built binary:
 
 ```bash
-curl -fsSL https://openkoi.dev/install.sh | sh
+curl -fsSL https://openkoi.ai/install.sh | sh
 ```
 
 Supports Linux (x86_64, ARM64) and macOS (Intel, Apple Silicon).

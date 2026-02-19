@@ -502,7 +502,7 @@ OpenKoi ships as a single static binary. No runtime dependencies, no package man
 | Channel | Command | Notes |
 |---------|---------|-------|
 | **cargo install** | `cargo install openkoi` | Source build. Works on Linux and macOS with a Rust toolchain. |
-| **Shell installer** | `curl -fsSL https://openkoi.dev/install.sh \| sh` | Detects OS/arch, downloads the correct binary. |
+| **Shell installer** | `curl -fsSL https://openkoi.ai/install.sh \| sh` | Detects OS/arch, downloads the correct binary. |
 | **GitHub Releases** | Download from releases page | Pre-built binaries. SHA256 checksums included. |
 
 ### Release Pipeline

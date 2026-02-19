@@ -130,7 +130,7 @@ Each integration exposes dual adapters (messaging + document) as MCP-compatible 
 
 ## Installation
 - cargo install openkoi
-- curl -fsSL https://openkoi.dev/install.sh | sh
+- curl -fsSL https://openkoi.ai/install.sh | sh
 - GitHub Releases (pre-built for Linux/macOS, x86_64/ARM64)
 
 ## Versioning
