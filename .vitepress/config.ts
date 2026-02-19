@@ -5,7 +5,21 @@ export default defineConfig({
     description: "The AI Agent that Iterates to Perfection.",
     head: [
         ['link', { rel: 'icon', type: 'image/png', href: '/logo.png' }],
-        ['meta', { name: 'theme-color', content: '#ea580c' }]
+        ['meta', { name: 'theme-color', content: '#ea580c' }],
+        // Open Graph
+        ['meta', { property: 'og:type', content: 'website' }],
+        ['meta', { property: 'og:title', content: 'OpenKoi — The AI Agent that Iterates to Perfection' }],
+        ['meta', { property: 'og:description', content: 'Self-iterating AI agent in Rust. Plan-Execute-Evaluate-Refine loop, 11 providers, pattern mining, local-first. <10ms startup, ~5MB memory.' }],
+        ['meta', { property: 'og:image', content: 'https://openkoi.ai/images/og-image.png' }],
+        ['meta', { property: 'og:image:width', content: '1200' }],
+        ['meta', { property: 'og:image:height', content: '630' }],
+        ['meta', { property: 'og:url', content: 'https://openkoi.ai' }],
+        ['meta', { property: 'og:site_name', content: 'OpenKoi' }],
+        // Twitter Card
+        ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+        ['meta', { name: 'twitter:title', content: 'OpenKoi — The AI Agent that Iterates to Perfection' }],
+        ['meta', { name: 'twitter:description', content: 'Self-iterating AI agent in Rust. Plan-Execute-Evaluate-Refine loop, 11 providers, pattern mining, local-first.' }],
+        ['meta', { name: 'twitter:image', content: 'https://openkoi.ai/images/og-image.png' }]
     ],
     themeConfig: {
         logo: '/logo.png',
