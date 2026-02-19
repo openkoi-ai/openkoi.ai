@@ -1,17 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
 :root {
     --vp-c-brand-1: #ea580c;
-    /* Rust Orange */
     --vp-c-brand-2: #ea580c;
     --vp-c-brand-3: #ea580c;
 
-    --vp-c-brand-next: #22d3ee;
-    /* Holographic Cyan */
-
     --openkoi-primary: #ea580c;
     --openkoi-secondary: #22d3ee;
-    --openkoi-bg: #0c0c0c;
+    --openkoi-bg: #0a0a0a;
 
     --vp-home-hero-name-color: transparent;
     --vp-home-hero-name-background: linear-gradient(135deg, var(--openkoi-primary) 0%, var(--openkoi-secondary) 100%);
@@ -19,68 +15,29 @@
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* Dark mode by default for OpenKoi */
+/* Dark mode */
 .dark {
-    --vp-c-bg: #0c0c0c;
-    --vp-c-bg-alt: #18181b;
-    --vp-c-bg-soft: #18181b;
+    --vp-c-bg: #0a0a0a;
+    --vp-c-bg-alt: #141416;
+    --vp-c-bg-soft: #141416;
     --vp-c-bg-mute: #27272a;
-
-    --vp-c-text-1: #f8fafc;
-    --vp-c-text-2: #94a3b8;
-
+    --vp-c-text-1: #e4e4e7;
+    --vp-c-text-2: #71717a;
     --vp-c-border: #27272a;
 }
 
-/* Background Animation Effect */
-body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at 50% 50%, rgba(234, 88, 12, 0.05) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(34, 211, 238, 0.05) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: -1;
-}
-
-/* Custom styles for logo */
+/* Active nav link */
 .VPNavBarMenuLink.active {
     color: var(--vp-c-brand-1) !important;
 }
 
-.VPHero .name {
-    -webkit-background-clip: text;
-    background-clip: text;
-}
-
 /* Circular Logo */
 .VPNavBar .logo {
-    border-radius: 50%;
+    border-radius: 6px;
     object-fit: cover;
-    background-color: #000;
 }
 
-/* Code block styles in landing page */
-.install-cmd-container {
-    font-family: 'JetBrains Mono', monospace;
-    background: #18181b;
-    padding: 0.75rem 1.25rem;
-    border: 1px solid #27272a;
-    border-radius: 8px;
-    display: inline-flex;
-    align-items: center;
-    gap: 1rem;
-    cursor: pointer;
-    margin-top: 1rem;
-}
-
-.install-cmd-container:hover {
-    border-color: var(--openkoi-primary);
-}
-
-.install-cmd-container code {
-    color: var(--openkoi-secondary);
+/* Code blocks — use JetBrains Mono */
+.vp-doc code {
+    font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
 }
