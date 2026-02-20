@@ -326,9 +326,13 @@ pub fn tools_for_integration(integration: &dyn Integration) -> Vec<ToolDef> {
 
 ### Connecting an Integration
 
-Use the `openkoi connect` command to set up an integration:
+Use the `openkoi connect` command to set up an integration. When run without an argument, an interactive picker shows all available providers and integrations:
 
 ```bash
+# Interactive picker (recommended)
+openkoi connect
+
+# Or specify directly
 openkoi connect slack
 openkoi connect notion
 openkoi connect telegram
@@ -336,7 +340,23 @@ openkoi connect imessage
 openkoi connect email
 ```
 
-The connect command walks you through the setup process specific to each integration:
+```
+$ openkoi connect
+
+? Select a provider or integration to connect:
+> GitHub Copilot — Device-code OAuth (use your existing subscription)
+  ChatGPT Plus/Pro — Device-code OAuth (use your existing subscription)
+  Slack — Bot token + channel selection
+  Discord — Bot token
+  Telegram — Bot token (@BotFather)
+  Notion — Integration token
+  iMessage — macOS system access (no key needed)
+  Google Docs/Sheets — OAuth2 credentials
+  Email — IMAP/SMTP credentials
+  ...
+```
+
+The connect command then walks you through the setup process specific to each integration:
 
 ```
 $ openkoi connect slack

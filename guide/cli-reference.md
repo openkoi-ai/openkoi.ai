@@ -11,9 +11,9 @@ OpenKoi ships as a single binary with a small, focused command surface. Primary 
 | `openkoi learn` | Review learned patterns and proposed skills |
 | `openkoi status` | Show memory, skills, integrations, and costs |
 | `openkoi init` | First-time setup wizard |
-| `openkoi connect <provider>` | Authenticate with an OAuth provider or set up an integration |
-| `openkoi disconnect <provider>` | Remove stored credentials for a provider |
-| `openkoi daemon <action>` | Manage the background daemon |
+| `openkoi connect [provider]` | Authenticate with an OAuth provider or set up an integration |
+| `openkoi disconnect [provider]` | Remove stored credentials for a provider |
+| `openkoi daemon [action]` | Manage the background daemon |
 | `openkoi doctor` | Run diagnostics on the system |
 | `openkoi update` | Update to the latest version |
 | `openkoi export` | Export all data to portable formats |
@@ -40,7 +40,8 @@ openkoi --model ollama/llama3.3 "Summarize this file" < README.md
 
 | Flag | Short | Default | Description |
 |------|-------|---------|-------------|
-| `--model <provider/model>` | `-m` | Auto-detected | Model to use. Format: `provider/model-name` (e.g., `anthropic/claude-sonnet-4-5`). |
+| `--model <provider/model>` | `-m` | Auto-detected | Model to use. Format: `provider/model-name` (e.g., `anthropic/claude-sonnet-4-5`). Pass `?` or `select` to open an interactive model picker. |
+| `--select-model` | | `false` | Open an interactive model picker showing all discovered providers and models with context window sizes. Equivalent to `-m ?`. |
 | `--iterate <n>` | `-i` | `3` | Maximum number of iterations. Set to `0` to skip self-evaluation entirely (single-shot execution). |
 | `--quality <threshold>` | `-q` | `0.8` | Quality threshold (0.0-1.0) to accept output. The iteration loop stops when the evaluator scores at or above this value. |
 | `--stdin` | | `false` | Read the task description from stdin instead of the argument list. |
@@ -123,11 +124,20 @@ openkoi learn
 
 ### Interaction
 
-The command lists detected patterns and any proposed skills. For each proposed skill, you can:
+When run without a subcommand, `learn` shows an interactive action picker:
 
-- **`[a]pprove`** -- Move the skill to your active skill set. If the skill has a schedule trigger, it will be scheduled.
-- **`[d]ismiss`** -- Reject the proposed skill. It will not be proposed again for this pattern.
-- **`[v]iew`** -- View the full generated SKILL.md content before deciding.
+```
+$ openkoi learn
+
+? What would you like to do?
+> List learned patterns and proposed skills
+  Install a managed skill
+  Evolve soul based on accumulated learnings
+```
+
+#### List patterns and proposed skills
+
+Lists detected patterns and any proposed skills. For each proposed skill, you choose from an interactive menu:
 
 ```
 $ openkoi learn
@@ -140,16 +150,44 @@ Patterns detected (last 30 days):
 Proposed skills:
   1. morning-slack-summary (conf: 0.89)
      "Fetch Slack messages, summarize discussions and action items."
-     [a]pprove  [d]ismiss  [v]iew
 
-  2. pr-review-workflow (conf: 0.82)
-     "Full PR review: checkout, review, fix, test, merge."
-     [a]pprove  [d]ismiss  [v]iew
+? What would you like to do with this skill?
+> Approve — add to active skills
+  Dismiss — reject this proposal
+  View — see the full SKILL.md content
 
-> a
 Approved: morning-slack-summary
   Saved to ~/.local/share/openkoi/skills/user/morning-slack-summary/
   Scheduled: daily at 09:00 (weekdays)
+```
+
+#### Install a managed skill
+
+Shows an interactive picker of available managed skills:
+
+```
+$ openkoi learn
+
+? Select a skill to install:
+> morning-slack-summary — Fetch and summarize daily Slack messages
+  pr-review-workflow — Full PR review: checkout, review, fix, test, merge
+  weekly-notion-notes — Compile weekly meeting notes to Notion
+```
+
+#### Evolve soul
+
+Reviews accumulated learnings and proposes personality updates. Confirmation uses an interactive prompt:
+
+```
+$ openkoi learn
+
+Proposed soul update (based on 73 tasks, 28 learnings):
+
+  @@ How I Think @@
+  + **Test before you ship.** I've learned that skipping tests costs more
+  + than writing them. Not 100% coverage -- but the critical paths need guards.
+
+? Apply this soul evolution? (y/n)
 ```
 
 ---
@@ -221,14 +259,37 @@ The wizard walks through:
 
 ---
 
-## `openkoi connect <provider>`
+## `openkoi connect [provider]`
 
-Authenticate with a subscription-based provider via OAuth device-code flow, or set up an integration with an external application.
+Authenticate with a subscription-based provider via OAuth device-code flow, or set up an integration with an external application. When run without an argument, shows an interactive picker.
+
+### Interactive Picker
+
+```
+$ openkoi connect
+
+? Select a provider or integration to connect:
+> GitHub Copilot — Device-code OAuth (use your existing subscription)
+  ChatGPT Plus/Pro — Device-code OAuth (use your existing subscription)
+  Anthropic — API key
+  OpenAI — API key
+  Google — API key
+  Slack — Bot token + channel selection
+  Discord — Bot token
+  Telegram — Bot token (@BotFather)
+  Notion — Integration token
+  iMessage — macOS system access (no key needed)
+  Google Docs/Sheets — OAuth2 credentials
+  Email — IMAP/SMTP credentials
+```
 
 ### OAuth Providers
 
 ```bash
-# Subscription providers (device-code flow, no API key needed)
+# Via picker (recommended)
+openkoi connect
+
+# Or specify directly
 openkoi connect copilot     # GitHub Copilot
 openkoi connect chatgpt     # ChatGPT Plus/Pro
 
@@ -260,9 +321,26 @@ Each integration has its own setup flow (typically entering an API token or OAut
 
 ---
 
-## `openkoi disconnect <provider>`
+## `openkoi disconnect [provider]`
 
-Remove stored credentials for a provider or integration.
+Remove stored credentials for a provider or integration. When run without an argument, shows an interactive picker listing only currently connected providers.
+
+### Interactive Picker
+
+```
+$ openkoi disconnect
+
+? Select a provider to disconnect:
+> GitHub Copilot (connected)
+  Anthropic (API key from env)
+  Ollama (localhost:11434)
+  Slack (connected)
+  All — remove all stored credentials
+```
+
+Only providers and integrations that are currently connected are shown. The "All" option removes every stored credential.
+
+### Direct Usage
 
 ```bash
 openkoi disconnect copilot      # Remove GitHub Copilot OAuth token
@@ -275,9 +353,9 @@ Disconnecting deletes the stored token or key file. You can reconnect at any tim
 
 ---
 
-## `openkoi daemon <action>`
+## `openkoi daemon [action]`
 
-Manage the background daemon. The daemon runs scheduled skills (e.g., daily summaries) and watches integrations for incoming messages.
+Manage the background daemon. The daemon runs scheduled skills (e.g., daily summaries) and watches integrations for incoming messages. When run without an action, shows an interactive picker.
 
 | Action | Description |
 |--------|-------------|
@@ -285,6 +363,19 @@ Manage the background daemon. The daemon runs scheduled skills (e.g., daily summ
 | `stop` | Gracefully shut down the daemon. |
 | `status` | Check whether the daemon is running, and show uptime and scheduled tasks. |
 | `restart` | Stop and restart the daemon. |
+
+### Interactive Picker
+
+```
+$ openkoi daemon
+
+? Select daemon action:
+> Start — launch the background daemon
+  Stop — gracefully shut down
+  Status — check if running, show uptime and scheduled tasks
+```
+
+### Direct Usage
 
 ```bash
 openkoi daemon start
@@ -340,10 +431,30 @@ On startup (max once per day), OpenKoi compares the local version against the la
 
 ## `openkoi export`
 
-Export all user data to portable formats.
+Export user data to portable formats. When run without arguments, shows interactive pickers for the export target and format.
+
+### Interactive Picker
+
+```
+$ openkoi export
+
+? What would you like to export?
+> All — sessions, learnings, skills, config, soul
+  Learnings — accumulated learnings only
+  Sessions — session transcripts only
+  Patterns — detected patterns and proposed skills
+
+? Export format:
+> JSON
+  YAML
+```
+
+### Direct Usage
 
 ```bash
-openkoi export --format json --output ~/openkoi-export/
+openkoi export all --format json --output ~/openkoi-export/
+openkoi export learnings --format yaml
+openkoi export sessions
 ```
 
 | Flag | Description |
@@ -428,7 +539,11 @@ Session cost: $0.18 (3 iterations, 24k tokens)
   + **Test before you ship.** I've learned that skipping tests costs more
   + than writing them. Not 100% coverage -- but the critical paths need guards.
 
-  [a]pply  [d]ismiss  [e]dit  [v]iew full
+  ? Apply this soul evolution?
+  > Apply
+    Dismiss
+    Edit
+    View full
 ```
 
 ---

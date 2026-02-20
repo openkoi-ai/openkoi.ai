@@ -94,22 +94,22 @@ OpenKoi probes for locally running model servers:
 
 ### 5. Interactive Picker
 
-If no credentials are found anywhere, OpenKoi shows a minimal interactive picker:
+If no credentials are found anywhere, OpenKoi shows an interactive selection menu:
 
 ```
-No API keys detected. Choose a provider to set up:
+No API keys detected.
 
-  1. GitHub Copilot (login with your subscription)
-  2. ChatGPT Plus/Pro (login with your subscription)
-  3. Anthropic (API key)
-  4. OpenAI (API key)
-  5. Google (API key)
-  6. Ollama (local, free)
-
-Enter choice:
+? Select a provider to set up:
+> GitHub Copilot — login with your existing subscription
+  ChatGPT Plus/Pro — login with your existing subscription
+  Anthropic — paste an API key
+  OpenAI — paste an API key
+  Google — paste an API key
+  Ollama — local, free (install from ollama.com)
+  Other (OpenAI-compatible URL)
 ```
 
-Options 1 and 2 use device-code OAuth — no API key needed. See [Providers](/guide/providers) for details on each provider.
+Use arrow keys to navigate, type to filter, and press Enter to select. Options 1 and 2 use device-code OAuth — no API key needed. See [Providers](/guide/providers) for details on each provider.
 
 ## Default Model Selection
 

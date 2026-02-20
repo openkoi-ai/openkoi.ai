@@ -383,12 +383,15 @@ The provider prefix is required to disambiguate models that may share names acro
 
 ## Connect and Disconnect
 
-Use `openkoi connect` to authenticate with subscription-based providers, and `openkoi disconnect` to remove stored credentials.
+Use `openkoi connect` to authenticate with subscription-based providers, and `openkoi disconnect` to remove stored credentials. Both commands support interactive selection when the provider argument is omitted.
 
 ### Connecting
 
 ```bash
-# Subscription providers (OAuth device-code flow)
+# Interactive picker (shows all providers and integrations with descriptions)
+openkoi connect
+
+# Or specify directly
 openkoi connect copilot     # GitHub Copilot
 openkoi connect chatgpt     # ChatGPT Plus/Pro
 
@@ -396,18 +399,46 @@ openkoi connect chatgpt     # ChatGPT Plus/Pro
 openkoi connect status
 ```
 
+When run without an argument, `connect` shows an interactive picker listing all 12 supported targets with descriptive hints:
+
+```
+$ openkoi connect
+
+? Select a provider or integration to connect:
+> GitHub Copilot — Device-code OAuth (use your existing subscription)
+  ChatGPT Plus/Pro — Device-code OAuth (use your existing subscription)
+  Anthropic — API key
+  OpenAI — API key
+  ...
+```
+
 Each `connect` command initiates a device-code flow: OpenKoi displays a URL and a short code, opens your browser, and waits for you to authorize. Once complete, tokens are saved to `~/.openkoi/auth.json` and refreshed automatically.
 
 ### Disconnecting
 
 ```bash
-# Remove a specific provider's credentials
+# Interactive picker (shows only currently connected providers)
+openkoi disconnect
+
+# Or specify directly
 openkoi disconnect copilot      # Remove GitHub Copilot OAuth token
 openkoi disconnect chatgpt      # Remove ChatGPT OAuth token
 openkoi disconnect anthropic    # Remove saved API key
 
 # Remove all OAuth tokens
 openkoi disconnect all
+```
+
+When run without an argument, `disconnect` dynamically scans your currently connected providers and integrations and shows only those in the picker, plus an "All" option:
+
+```
+$ openkoi disconnect
+
+? Select a provider to disconnect:
+> GitHub Copilot (connected)
+  Anthropic (API key from env)
+  Slack (connected)
+  All — remove all stored credentials
 ```
 
 Disconnecting deletes the stored token or key. You can reconnect at any time by running `openkoi connect` again.
