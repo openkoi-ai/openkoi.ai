@@ -185,7 +185,7 @@ OpenKoi checks for updates once per day on startup. If a new version is availabl
 
 ## Versioning
 
-OpenKoi uses **CalVer** format: `YYYY.M.D` (e.g., `2026.2.18`). Pre-releases use `YYYY.M.D-beta.N`. This matches the OpenClaw versioning scheme.
+OpenKoi uses **CalVer** format: `YYYY.M.D` (e.g., `2026.2.18`). Pre-releases use `YYYY.M.D-beta.N`. 
 
 ## Directory Structure
 

@@ -552,8 +552,6 @@ Full version example: `2026.3.15`
 
 Pre-release versions append a suffix: `2026.3.15-beta.1`
 
-This matches the convention used by OpenClaw and makes it immediately obvious when a release was published. There is no semver -- breaking changes are communicated through release notes and migration guides.
-
 ### Upgrade Behavior
 
 When a new version is installed (via `openkoi update` or any package manager), the first startup:

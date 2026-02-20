@@ -109,28 +109,29 @@ resolve_version() {
 # --- Download ---
 
 download() {
-    TMPDIR="$(mktemp -d)"
-    trap 'rm -rf "$TMPDIR"' EXIT
+    WORK_DIR="$(mktemp -d)"
+    trap 'rm -rf "$WORK_DIR"' EXIT
 
     info "downloading ${BINARY} ${VERSION} for ${OS}/${ARCH}..."
 
     if command -v curl > /dev/null 2>&1; then
-        curl -fsSL "$DOWNLOAD_URL" -o "${TMPDIR}/${ARCHIVE}" || error "download failed. Is ${VERSION} released for ${OS}/${ARCH}?"
-        curl -fsSL "$CHECKSUM_URL" -o "${TMPDIR}/${ARCHIVE}.sha256" 2>/dev/null || true
+        curl -fsSL "$DOWNLOAD_URL" -o "${WORK_DIR}/${ARCHIVE}" || error "download failed. Is ${VERSION} released for ${OS}/${ARCH}?"
+        curl -fsSL "$CHECKSUM_URL" -o "${WORK_DIR}/${ARCHIVE}.sha256" 2>/dev/null || true
     elif command -v wget > /dev/null 2>&1; then
-        wget -q "$DOWNLOAD_URL" -O "${TMPDIR}/${ARCHIVE}" || error "download failed. Is ${VERSION} released for ${OS}/${ARCH}?"
-        wget -q "$CHECKSUM_URL" -O "${TMPDIR}/${ARCHIVE}.sha256" 2>/dev/null || true
+        wget -q "$DOWNLOAD_URL" -O "${WORK_DIR}/${ARCHIVE}" || error "download failed. Is ${VERSION} released for ${OS}/${ARCH}?"
+        wget -q "$CHECKSUM_URL" -O "${WORK_DIR}/${ARCHIVE}.sha256" 2>/dev/null || true
     fi
 
     # Verify checksum if available
-    if [ -f "${TMPDIR}/${ARCHIVE}.sha256" ] && [ -s "${TMPDIR}/${ARCHIVE}.sha256" ]; then
+    if [ -f "${WORK_DIR}/${ARCHIVE}.sha256" ] && [ -s "${WORK_DIR}/${ARCHIVE}.sha256" ]; then
         info "verifying checksum..."
-        EXPECTED="$(cut -d' ' -f1 < "${TMPDIR}/${ARCHIVE}.sha256")"
+        EXPECTED="$(cut -d' ' -f1 < "${WORK_DIR}/${ARCHIVE}.sha256")"
         if command -v sha256sum > /dev/null 2>&1; then
-            ACTUAL="$(sha256sum "${TMPDIR}/${ARCHIVE}" | cut -d' ' -f1)"
+            ACTUAL="$(sha256sum "${WORK_DIR}/${ARCHIVE}" | cut -d' ' -f1)"
         elif command -v shasum > /dev/null 2>&1; then
-            ACTUAL="$(shasum -a 256 "${TMPDIR}/${ARCHIVE}" | cut -d' ' -f1)"
+            ACTUAL="$(shasum -a 256 "${WORK_DIR}/${ARCHIVE}" | cut -d' ' -f1)"
         else
+            info "warning: no sha256sum or shasum found, skipping checksum verification"
             ACTUAL=""
         fi
         if [ -n "$ACTUAL" ] && [ "$EXPECTED" != "$ACTUAL" ]; then
@@ -141,11 +142,11 @@ download() {
 
 # --- Install ---
 
-install() {
+install_binary() {
     info "extracting..."
-    tar xzf "${TMPDIR}/${ARCHIVE}" -C "${TMPDIR}"
+    tar xzf "${WORK_DIR}/${ARCHIVE}" -C "${WORK_DIR}"
 
-    if [ ! -f "${TMPDIR}/${BINARY}" ]; then
+    if [ ! -f "${WORK_DIR}/${BINARY}" ]; then
         error "binary not found in archive"
     fi
 
@@ -157,9 +158,19 @@ install() {
     info "installing to ${INSTALL_DIR}/${BINARY}..."
 
     if [ "$GLOBAL" -eq 1 ]; then
-        sudo install -m 755 "${TMPDIR}/${BINARY}" "${INSTALL_DIR}/${BINARY}"
+        if command -v install > /dev/null 2>&1; then
+            sudo install -m 755 "${WORK_DIR}/${BINARY}" "${INSTALL_DIR}/${BINARY}"
+        else
+            sudo cp "${WORK_DIR}/${BINARY}" "${INSTALL_DIR}/${BINARY}"
+            sudo chmod 755 "${INSTALL_DIR}/${BINARY}"
+        fi
     else
-        install -m 755 "${TMPDIR}/${BINARY}" "${INSTALL_DIR}/${BINARY}"
+        if command -v install > /dev/null 2>&1; then
+            install -m 755 "${WORK_DIR}/${BINARY}" "${INSTALL_DIR}/${BINARY}"
+        else
+            cp "${WORK_DIR}/${BINARY}" "${INSTALL_DIR}/${BINARY}"
+            chmod 755 "${INSTALL_DIR}/${BINARY}"
+        fi
     fi
 }
 
@@ -203,7 +214,7 @@ main() {
     detect_platform
     resolve_version
     download
-    install
+    install_binary
     post_install
 }
 
