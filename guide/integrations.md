@@ -14,17 +14,17 @@ For apps where communication is message-based and often real-time.
 #[async_trait]
 pub trait MessagingAdapter: Send + Sync {
     async fn send(&self, target: &str, content: &str) -> Result<String>;
+    async fn send_rich(&self, target: &str, msg: &RichMessage) -> Result<String>;
     async fn history(&self, channel: &str, limit: u32) -> Result<Vec<IncomingMessage>>;
-    async fn watch(&self, channel: &str, handler: MessageHandler) -> Result<()>;
     async fn search(&self, query: &str) -> Result<Vec<IncomingMessage>>;
 }
 ```
 
 | Method | Purpose |
 |--------|---------|
-| `send` | Send a message to a target (channel, user, thread) |
+| `send` | Send a plain text message to a target (channel, user, thread) |
+| `send_rich` | Send a structured message with title, fields, color, and thread support |
 | `history` | Retrieve recent messages from a channel |
-| `watch` | Subscribe to new messages in real-time (used by daemon mode) |
 | `search` | Search message history by keyword |
 
 ### DocumentAdapter
@@ -79,6 +79,14 @@ Capabilities:
 - Watch for incoming messages (requires daemon mode)
 - Search message history
 
+#### Trigger Pattern
+
+The daemon triggers a task when it sees a message starting with `koi:`:
+
+| Pattern | Example |
+|---------|---------|
+| `koi: <task>` | `koi: summarize the project readme` |
+
 Limitations:
 - macOS only (AppleScript dependency)
 - Requires granting Accessibility permissions to OpenKoi
@@ -88,18 +96,88 @@ Limitations:
 
 **Type:** Messaging only | **Protocol:** Bot API
 
-Connects via the Telegram Bot API. You create a bot through [@BotFather](https://t.me/BotFather) and provide the token.
+Connects via the [Telegram Bot API](https://core.telegram.org/bots/api). You create a bot through [@BotFather](https://t.me/BotFather) and provide the token.
+
+#### Setup
+
+1. Open Telegram and message [@BotFather](https://t.me/BotFather).
+2. Send `/newbot`, follow the prompts to name your bot.
+3. Copy the bot token (format: `123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11`).
+4. Connect it to OpenKoi:
 
 ```bash
-# Set via environment variable
+# Interactive setup (recommended)
+openkoi connect telegram
+
+# Or set via environment variable
 export TELEGRAM_BOT_TOKEN=123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
 ```
 
-Capabilities:
-- Send and receive messages
-- Support for groups and channels
-- Message search via bot history
-- File and media sharing
+5. Add your bot to a group chat, or message it directly.
+6. Get the chat ID by sending a message to the bot and checking:
+
+```bash
+curl https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates
+```
+
+Look for `"chat": {"id": ...}` in the response. Group/supergroup IDs are negative (e.g., `-1001234567890`), direct chat IDs are positive.
+
+7. Configure which chats the daemon should watch:
+
+```toml
+[integrations.telegram]
+enabled = true
+channels = ["-1001234567890", "987654321"]
+```
+
+#### Sending Messages to Telegram
+
+When a task completes (triggered from Telegram or the API), OpenKoi replies to the same chat. Two message formats are used:
+
+**Plain text** -- simple text via `sendMessage`:
+
+```
+Task completed: Fix the login bug
+Score: 0.92 | Cost: $0.18 | Iterations: 2
+```
+
+**Rich message** -- structured output with bold title, key-value fields, and thread reply:
+
+```
+*Task Complete: Fix the login bug*
+Score: 0.92 | Cost: $0.18 | Iterations: 2
+
+Fixed the null check in validateToken() that caused...
+```
+
+Rich messages use `reply_to_message_id` to thread back to the original command message.
+
+#### Receiving Messages from Telegram
+
+The daemon polls `getUpdates` every **10 seconds** for new messages in configured channels. A task is triggered when OpenKoi detects one of these patterns:
+
+| Pattern | Example | Notes |
+|---------|---------|-------|
+| `/koi <task>` | `/koi fix the login bug` | Standard bot command |
+| `/koi@botname <task>` | `/koi@myopenkoi_bot fix the login bug` | Group format (Telegram appends bot name) |
+| `@openkoi_bot <task>` | `@openkoi_bot summarize this thread` | Mention anywhere in message |
+
+The text after the trigger pattern becomes the task description. The daemon executes the task and replies in the same chat with the result.
+
+#### Progress Notifications
+
+During long-running tasks, the daemon sends progress updates every **60 seconds** to the originating chat:
+
+```
+*In Progress: Fix the login bug*
+Phase: executing | Iteration: 2/3 | Score: 0.78
+```
+
+#### Limitations
+
+- No message search (Telegram Bot API does not support it)
+- History is limited to unprocessed updates via `getUpdates` (no deep message history)
+- Bot must be added to groups manually; it cannot join on its own
 
 ### Slack
 
@@ -121,6 +199,24 @@ channels = ["#engineering", "#general", "#product"]
 
 Required Slack app scopes: `channels:read`, `channels:history`, `chat:write`, `search:read`, `users:read`.
 
+#### Trigger Patterns
+
+The daemon watches configured channels (polling every **30 seconds**) and triggers a task when it detects:
+
+| Pattern | Example |
+|---------|---------|
+| `@openkoi <task>` | `@openkoi summarize this thread` |
+| `<@openkoi> <task>` | Slack's native mention format |
+
+#### Rich Messages
+
+Task results are sent as Slack [Block Kit](https://api.slack.com/block-kit) attachments with:
+
+- Bold title
+- Key-value fields (Score, Cost, Iterations) displayed inline
+- Color sidebar (green for success, red for failure)
+- Thread support -- replies to the original message when triggered from a thread
+
 ### Discord
 
 **Type:** Messaging only | **Protocol:** Bot Gateway
@@ -132,6 +228,19 @@ Capabilities:
 - Thread support
 - Message history and search
 - Reaction monitoring
+
+#### Trigger Patterns
+
+The daemon watches configured channels (polling every **30 seconds**) and triggers tasks when it detects `@openkoi <task>` in a message.
+
+#### Rich Messages
+
+Task results are sent as Discord embeds with:
+
+- Title and description
+- Inline fields (Score, Cost, Iterations)
+- Color sidebar
+- Thread reply via `message_reference` when triggered from a thread
 
 ### MS Teams
 
@@ -145,6 +254,10 @@ Required credentials:
   tenant_id      - Azure AD tenant ID
   team_id        - Target team ID
 ```
+
+#### Trigger Pattern
+
+Same as Slack/Discord: `@openkoi <task>` mention in a watched channel.
 
 ### Notion
 
@@ -222,6 +335,68 @@ Capabilities:
 - Send emails
 - Search email by subject, sender, date
 - Watch for new emails (IMAP IDLE)
+
+## Rich Messaging
+
+When the daemon completes a task triggered from an integration, it sends a structured `RichMessage` instead of plain text. Rich messages provide a consistent format across platforms while adapting to each platform's native formatting.
+
+### RichMessage Structure
+
+```rust
+pub struct RichMessage {
+    pub text: String,              // Main body text
+    pub title: Option<String>,     // Bold heading
+    pub fields: Vec<(String, String)>, // Key-value pairs (e.g., Score: 0.92)
+    pub color: Option<String>,     // Sidebar color (#36a64f for success)
+    pub thread_id: Option<String>, // Reply to this message/thread
+}
+```
+
+### Platform Rendering
+
+| Platform | Title | Fields | Color | Thread |
+|----------|-------|--------|-------|--------|
+| **Slack** | Block Kit header | Inline fields in attachment | Attachment sidebar color | `thread_ts` reply |
+| **Discord** | Embed title | Embed fields (inline) | Embed color | `message_reference` |
+| **Telegram** | Bold Markdown (`*title*`) | Inline text (`Key: Value \| ...`) | Not supported | `reply_to_message_id` |
+| **MS Teams** | Adaptive Card title | Card fields | Theme color | Thread reply |
+
+### Example: Task Completion
+
+When a task completes, the daemon sends a rich message like:
+
+**Slack rendering:**
+```
+┌─────────────────────────────────────┐
+│ Task Complete: Fix the login bug    │ ← title
+├─────────────────────────────────────┤
+│ Score: 0.92  Cost: $0.18            │ ← fields
+│ Iterations: 2                       │
+├─────────────────────────────────────┤
+│ Fixed the null check in             │ ← body text
+│ validateToken() that caused...      │
+└─────────────────────────────────────┘
+  ▌ green sidebar                       ← color
+```
+
+**Telegram rendering:**
+```
+*Task Complete: Fix the login bug*
+Score: 0.92 | Cost: $0.18 | Iterations: 2
+
+Fixed the null check in validateToken() that caused...
+```
+
+### Progress Notifications
+
+During long-running tasks, the daemon sends progress updates every **60 seconds** via rich messages:
+
+```
+*In Progress: Fix the login bug*
+Phase: executing | Iteration: 2/3 | Score: 0.78 | Cost: $0.12
+```
+
+These are sent to the same channel/thread as the original trigger message.
 
 ## Auto-Registered Tools
 
@@ -452,16 +627,40 @@ The agent seamlessly uses tools from multiple integrations in the same task. The
 
 ### Background Watching
 
-When running as a daemon (`openkoi daemon start`), integrations with `watch` capability can monitor channels for incoming messages and trigger automated responses:
+When running as a daemon (`openkoi daemon start`), integrations with messaging capability are polled for incoming messages at regular intervals:
+
+| Integration | Poll Interval | Trigger Pattern |
+|-------------|--------------|-----------------|
+| Slack | 30s | `@openkoi <task>` |
+| Discord | 30s | `@openkoi <task>` |
+| MS Teams | 30s | `@openkoi <task>` |
+| Telegram | 10s | `/koi <task>` or `@openkoi_bot <task>` |
+| iMessage | 30s | `koi: <task>` |
+| Email | 60s | Subject or body matching configured keywords |
+
+When a trigger is detected, the daemon:
+
+1. Extracts the task description from the message
+2. Executes the task through the full iteration engine
+3. Sends progress updates every 60 seconds (as rich messages when supported)
+4. Replies with the final result in the same channel/thread
 
 ```toml
-# Daemon watches these channels for messages mentioning @openkoi
+# config.toml — enable watching for specific integrations
 [integrations.slack]
 enabled = true
 channels = ["#engineering", "#general"]
+
+[integrations.telegram]
+enabled = true
+channels = ["-1001234567890"]
+
+[integrations.discord]
+enabled = true
+channels = ["engineering", "general"]
 ```
 
-Messages directed at the agent (e.g., `@openkoi summarize this thread`) are picked up by the watcher and processed as tasks.
+Messages directed at the agent (e.g., `@openkoi summarize this thread` or `/koi fix the login bug`) are picked up by the watcher and processed as tasks. The daemon responds through the same integration with structured results.
 
 ## Checking Integration Status
 

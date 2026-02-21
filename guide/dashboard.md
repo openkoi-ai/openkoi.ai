@@ -25,6 +25,45 @@ The `--verbose` flag shows a detailed breakdown of each category:
 
 ```bash
 $ openkoi status --verbose
+```
+
+### Live Task Monitoring
+
+The `--live` flag watches the currently running task in real-time, polling `~/.openkoi/state/current-task.json` every second:
+
+```bash
+$ openkoi status --live
+
+  Task:       Fix the login bug
+  ID:         a1b2c3d4
+  Phase:      executing
+  Progress:   [████████░░░░░░░░░░░░░░░░░░░░░░] (2/5)
+  Score:      0.78 (best: 0.82)
+  Cost:       $0.1234
+  Tokens:     24,500
+  Elapsed:    12s
+
+  Recent history (last 5):
+    0.92  Add error handling to api.rs
+    0.88  Refactor auth module
+    0.85  Fix pagination in user list
+```
+
+The display refreshes every second and exits with Ctrl-C. All output goes to stderr so it doesn't interfere with piped output.
+
+### Task State Files
+
+OpenKoi persists task state to the filesystem for external tools and the `--live` flag:
+
+| File | Purpose | Format |
+|------|---------|--------|
+| `~/.openkoi/state/current-task.json` | Currently running task | JSON (atomic writes) |
+| `~/.openkoi/state/task-history.jsonl` | Completed tasks log | JSON Lines (auto-rotates at 1000 lines or 1MB) |
+
+The `current-task.json` file is updated at each lifecycle transition (plan, iteration start, iteration end, completion) using atomic write-to-temp-then-rename. External scripts can poll this file safely without risk of partial reads.
+
+```bash
+$ openkoi status --verbose
 
   Memory:
     Chunks:       1,249 entries (12MB SQLite)
@@ -401,6 +440,82 @@ Dashboard and daemon behavior can be configured via environment variables:
 | `OPENKOI_DATA` | `~/.local/share/openkoi` | Data directory (database, transcripts, skills). |
 | `OPENKOI_CONFIG` | `~/.openkoi/config.toml` | Path to configuration file. |
 
+## HTTP API
+
+When the daemon is running, it exposes a localhost REST API (default port 9742) for external tools, scripts, and web UIs. The API is configured in the `[api]` section of `config.toml` (see [Configuration](/guide/configuration)).
+
+### Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/v1/tasks` | Submit a new task |
+| `GET` | `/api/v1/tasks` | List recent tasks from history |
+| `GET` | `/api/v1/tasks/{id}` | Get a specific task (active or historical) |
+| `POST` | `/api/v1/tasks/{id}/cancel` | Request cancellation of a running task |
+| `GET` | `/api/v1/status` | System status (version, daemon state, active task, daily summary) |
+| `GET` | `/api/v1/cost` | Cost summary (events in last 24 hours, recent tasks) |
+| `GET` | `/api/v1/health` | Health check |
+
+### Examples
+
+```bash
+# Submit a task
+curl -X POST http://localhost:9742/api/v1/tasks \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-token" \
+  -d '{"description": "Fix the login bug", "max_iterations": 5, "quality_threshold": 0.9}'
+
+# List recent tasks
+curl http://localhost:9742/api/v1/tasks
+
+# Get task by ID
+curl http://localhost:9742/api/v1/tasks/a1b2c3d4-5678-90ab-cdef-1234567890ab
+
+# Cancel a running task (best-effort, at next iteration boundary)
+curl -X POST http://localhost:9742/api/v1/tasks/a1b2c3d4-.../cancel
+
+# System status
+curl http://localhost:9742/api/v1/status
+
+# Cost summary
+curl http://localhost:9742/api/v1/cost
+
+# Health check
+curl http://localhost:9742/api/v1/health
+```
+
+### Authentication
+
+When `api.token` is set in `config.toml`, all requests must include the `Authorization: Bearer <token>` header. When the token is empty (default), no authentication is required -- the API only listens on localhost.
+
+### Webhooks
+
+Outbound HTTP callbacks fire on lifecycle events. Configure in `config.toml`:
+
+```toml
+[api.webhooks]
+on_task_complete = "https://example.com/hooks/complete"
+on_task_failed = "https://example.com/hooks/failed"
+on_budget_warning = "https://example.com/hooks/budget"
+```
+
+Webhook payloads are JSON with an `event` field and event-specific data:
+
+```json
+{
+  "event": "task.complete",
+  "timestamp": "2026-02-22T10:30:07Z",
+  "task_id": "a1b2c3d4-...",
+  "description": "Fix the login bug",
+  "iterations": 2,
+  "final_score": 0.92,
+  "cost_usd": 0.18,
+  "total_tokens": 24500
+}
+```
+
+Delivery is fire-and-forget with a 10-second timeout. Failed deliveries are logged but not retried.
+
 ## Summary
 
 | Tool | Command | Purpose |
@@ -408,7 +523,9 @@ Dashboard and daemon behavior can be configured via environment variables:
 | **Status** | `openkoi status` | Quick overview of memory, skills, cost. |
 | **Verbose status** | `openkoi status --verbose` | Detailed breakdown of every subsystem. |
 | **Cost dashboard** | `openkoi status --costs` | Cost breakdown by time period and model. |
+| **Live monitoring** | `openkoi status --live` | Real-time view of the running task with progress bar. |
 | **Doctor** | `openkoi doctor` | Health check with fix suggestions. |
 | **Daemon** | `openkoi daemon start` | Background execution of scheduled skills and watchers. |
+| **HTTP API** | `localhost:9742` | REST API for external tools and scripts. |
 | **REPL** | `openkoi chat` | Interactive session with slash commands. |
 | **Transcripts** | `~/.local/share/openkoi/sessions/` | JSONL audit trail of every session. |

@@ -32,6 +32,7 @@ executor  = "anthropic/claude-sonnet-4-5"   # Does the work
 evaluator = "anthropic/claude-opus-4-6"     # Judges the output
 planner   = "anthropic/claude-sonnet-4-5"   # Plans strategy
 embedder  = "openai/text-embedding-3-small" # Generates embeddings
+small_model = "anthropic/claude-haiku-3.5"  # Fast/cheap model for titles, summaries
 
 # Fallback chains per role. If the primary model fails (rate limit,
 # outage), the next candidate is tried after a cooldown.
@@ -82,10 +83,23 @@ enabled = true
 enabled = true   # macOS only
 
 [integrations.telegram]
-enabled = false
+enabled = true
+channels = ["-1001234567890"]  # Chat IDs to watch (negative = groups)
 
 [integrations.discord]
 enabled = false
+channels = ["engineering", "general"]
+
+# ─── HTTP API ────────────────────────────────────────────────────
+[api]
+enabled = true     # Enable the localhost REST API (runs alongside daemon)
+port = 9742        # API listen port
+token = ""         # Optional Bearer token for authentication
+
+[api.webhooks]
+on_task_complete  = ""   # URL to POST when a task completes
+on_task_failed    = ""   # URL to POST when a task fails
+on_budget_warning = ""   # URL to POST when budget threshold is hit
 
 # ─── Plugins ─────────────────────────────────────────────────────
 [plugins]
@@ -130,6 +144,8 @@ Assigns models to the four agent roles. Each value uses the `provider/model-name
 | `embedder` | Embedder | Generates vector embeddings for semantic search in memory. |
 
 If you only set `executor`, the same model is used for all roles (except embedder, which defaults to `openai/text-embedding-3-small`).
+
+The `small_model` field specifies a fast, cheap model used for cost-sensitive internal tasks like generating titles, summaries, and chat context compression. If not set, OpenKoi auto-resolves one from available providers (preferring Haiku > GPT-4o-mini > Gemini Flash).
 
 #### `[models.fallback]`
 
@@ -201,8 +217,8 @@ Each integration has its own sub-table. The `enabled` key is required; additiona
 | `slack` | `enabled`, `channels` | `channels` is an array of channel names to watch. |
 | `notion` | `enabled` | Notion API key comes from `NOTION_API_KEY` env var. |
 | `imessage` | `enabled` | macOS only. Uses AppleScript. |
-| `telegram` | `enabled` | Bot token from `TELEGRAM_BOT_TOKEN` env var. |
-| `discord` | `enabled` | Bot token from config or env. |
+| `telegram` | `enabled`, `channels` | `channels` is an array of chat IDs (strings). Use negative IDs for groups. Bot token from `TELEGRAM_BOT_TOKEN` env var. |
+| `discord` | `enabled`, `channels` | `channels` is an array of channel names. Bot token from config or env. |
 | `google_docs` | `enabled` | OAuth2 flow on first use. |
 | `google_sheets` | `enabled` | OAuth2 flow on first use. |
 | `ms_office` | `enabled` | Reads local `.docx`/`.xlsx` files directly. |
@@ -218,6 +234,40 @@ Three tiers of extensibility.
 | `wasm` | array of strings | Paths to WASM plugin files. Plugins run in a wasmtime sandbox with explicit capability grants. |
 | `scripts` | array of strings | Paths to Rhai script files. Scripts run in a sandboxed interpreter and can hook into the agent lifecycle. |
 | `mcp` | array of tables | MCP (Model Context Protocol) tool servers. Each entry is a subprocess that provides tools via JSON-RPC over stdio. |
+
+### `[api]`
+
+Controls the localhost HTTP REST API that runs alongside the daemon. This enables external tools, scripts, and web UIs to submit tasks and query status.
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `enabled` | bool | `true` | Whether to start the API server when the daemon runs. |
+| `port` | integer | `9742` | TCP port for the API server. |
+| `token` | string | `""` | Optional Bearer token for authentication. When set, all requests must include `Authorization: Bearer <token>`. When empty, no auth is required (localhost only). |
+
+#### `[api.webhooks]`
+
+Outbound HTTP callbacks fired on lifecycle events. Each value is a URL. When set, OpenKoi sends a `POST` with a JSON payload to the URL when the corresponding event occurs. Webhook delivery is fire-and-forget (non-blocking, 10-second timeout).
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `on_task_complete` | string | `""` | URL to POST when a task completes successfully. Payload includes `task_id`, `description`, `iterations`, `final_score`, `cost_usd`, `total_tokens`. |
+| `on_task_failed` | string | `""` | URL to POST when a task fails. Payload includes `task_id`, `description`, `error`. |
+| `on_budget_warning` | string | `""` | URL to POST when spending approaches the configured budget. Payload includes `current_spend`, `budget`, `percent`. |
+
+Example:
+
+```toml
+[api]
+enabled = true
+port = 9742
+token = "my-secret-token"
+
+[api.webhooks]
+on_task_complete = "https://example.com/hooks/openkoi/complete"
+on_task_failed = "https://example.com/hooks/openkoi/failed"
+on_budget_warning = "https://slack.com/api/chat.postMessage"
+```
 
 #### MCP Server Configuration
 

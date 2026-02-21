@@ -234,6 +234,7 @@ Any provider that implements the OpenAI Chat Completions API can be used. These 
 | **OpenRouter** | `OPENROUTER_API_KEY` | `auto` | `https://openrouter.ai/api/v1` |
 | **Together** | `TOGETHER_API_KEY` | `meta-llama/Llama-3.3-70B-Instruct-Turbo` | `https://api.together.xyz/v1` |
 | **DeepSeek** | `DEEPSEEK_API_KEY` | `deepseek-chat` | `https://api.deepseek.com/v1` |
+| **Moonshot / Kimi** | `MOONSHOT_API_KEY` | `kimi-k2.5` | `https://api.moonshot.cn/v1` |
 | **xAI** | `XAI_API_KEY` | `grok-4-0709` | `https://api.x.ai/v1` |
 | **Custom** | User-defined | User-defined | User-defined |
 
