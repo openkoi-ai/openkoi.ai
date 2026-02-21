@@ -561,6 +561,7 @@ OpenKoi reads the following environment variables. These override corresponding 
 
 | Variable | Description |
 |----------|-------------|
+| `OPENKOI_HOME` | Override all config and data paths. When set, config lives at `$OPENKOI_HOME/` and data at `$OPENKOI_HOME/data/`. Useful for testing and isolation. |
 | `OPENKOI_MODEL` | Default model in `provider/model` format. Overrides the auto-detected default. Example: `OPENKOI_MODEL=ollama/codestral`. |
 | `OPENKOI_CONFIG` | Path to the configuration file. Default: `~/.openkoi/config.toml`. |
 | `OPENKOI_DATA` | Path to the data directory. Default: `~/.local/share/openkoi`. |

@@ -36,9 +36,12 @@ The configuration directory (`~/.openkoi/`) holds user-facing files: settings, c
 You can override these paths with environment variables:
 
 ```bash
+OPENKOI_HOME=~/my-openkoi          # overrides both config and data dirs
 OPENKOI_CONFIG=~/.openkoi/config.toml
 OPENKOI_DATA=~/.local/share/openkoi
 ```
+
+`OPENKOI_HOME` sets the root for **all** OpenKoi directories — config files go under `$OPENKOI_HOME/` and data files under `$OPENKOI_HOME/data/`. It takes precedence over `OPENKOI_CONFIG` and `OPENKOI_DATA` when set.
 
 ## SQLite Schema
 

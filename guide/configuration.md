@@ -17,6 +17,15 @@ openkoi --config ./project-openkoi.toml "Fix the bug"
 OPENKOI_CONFIG=~/custom-config.toml openkoi "Fix the bug"
 ```
 
+To relocate all config and data under a single directory, set `OPENKOI_HOME`:
+
+```bash
+export OPENKOI_HOME=/tmp/openkoi-sandbox
+openkoi status   # config at /tmp/openkoi-sandbox/, data at /tmp/openkoi-sandbox/data/
+```
+
+When `OPENKOI_HOME` is set, `OPENKOI_CONFIG` and `OPENKOI_DATA` are ignored.
+
 ---
 
 ## Full Reference

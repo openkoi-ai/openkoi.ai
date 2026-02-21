@@ -436,6 +436,7 @@ Dashboard and daemon behavior can be configured via environment variables:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
+| `OPENKOI_HOME` | _(unset)_ | Override all config and data paths. Config at `$OPENKOI_HOME/`, data at `$OPENKOI_HOME/data/`. |
 | `OPENKOI_LOG_LEVEL` | `info` | Log verbosity: `error`, `warn`, `info`, `debug`, `trace`. |
 | `OPENKOI_DATA` | `~/.local/share/openkoi` | Data directory (database, transcripts, skills). |
 | `OPENKOI_CONFIG` | `~/.openkoi/config.toml` | Path to configuration file. |
