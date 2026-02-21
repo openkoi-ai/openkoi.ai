@@ -43,7 +43,7 @@ openkoi --model ollama/llama3.3 "Summarize this file" < README.md
 | `--model <provider/model>` | `-m` | Auto-detected | Model to use. Format: `provider/model-name` (e.g., `anthropic/claude-sonnet-4-5`). Pass `?` or `select` to open an interactive model picker. |
 | `--select-model` | | `false` | Open an interactive model picker showing all discovered providers and models with context window sizes. Equivalent to `-m ?`. |
 | `--iterate <n>` | `-i` | `3` | Maximum number of iterations. Set to `0` to skip self-evaluation entirely (single-shot execution). |
-| `--quality <threshold>` | | `0.8` | Quality threshold (0.0-1.0) to accept output. The iteration loop stops when the evaluator scores at or above this value. |
+| `--quality <threshold>` | `-q` | `0.8` | Quality threshold (0.0-1.0) to accept output. The iteration loop stops when the evaluator scores at or above this value. |
 | `--quiet` | | `false` | Suppress all progress output. Only the final result is emitted to stdout. Progress normally goes to stderr, so stdout stays clean for piping even without this flag. |
 | `--stdin` | | `false` | Read the task description from stdin instead of the argument list. |
 | `--format <fmt>` | | `text` | Output format. Supported values: `text`, `json`, `markdown`. |
