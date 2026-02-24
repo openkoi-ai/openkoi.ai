@@ -1,15 +1,33 @@
 # Introduction
 
-OpenKoi is a standalone, CLI-first AI agent platform written in Rust. Unlike traditional AI tools that generate a single response and stop, OpenKoi follows a rigorous **Plan-Execute-Evaluate-Refine** cycle — iterating on its own output until results meet your quality standards.
+AI coding tools today generate a first draft and stop. You review it, fix it, re-prompt corrections, and iterate — becoming the AI's QA department on top of being the developer. OpenKoi is different.
 
-It ships as a single static binary with zero runtime dependencies. No Node.js, no Python, no Docker containers.
+OpenKoi follows a rigorous **Plan-Execute-Evaluate-Refine** cycle. It reviews its own output using domain-specific rubrics, identifies what needs improvement, and iterates — until results meet your quality standards. You describe the task. OpenKoi does the iteration.
 
 ```bash
 cargo install openkoi
 openkoi "Refactor the auth module to use JWT tokens"
 ```
 
-That's it. OpenKoi detects your API keys from the environment, picks the best available model, infers the task type, and starts iterating.
+That's it. OpenKoi detects your API keys from the environment, picks the best available model, infers the task type, and starts iterating. No config file needed. No setup wizard. Max two interactions before your first result.
+
+## Three Steps
+
+| Step | What happens |
+|------|--------------|
+| **1. Install** | One command. Single static binary, ~20MB. No Python, no Node, no Docker. |
+| **2. Run** | Describe what you want. OpenKoi finds your API keys from env vars, existing CLI tools, and local model servers automatically. |
+| **3. Ship** | OpenKoi iterates — plan, execute, evaluate, refine — until the code passes its own quality review. |
+
+## What Changes
+
+| Before | After |
+|--------|-------|
+| You manually review every AI output | OpenKoi evaluates its own work against rubrics |
+| You re-prompt corrections 3–5 times | Automatic iteration, stops when quality threshold is met |
+| Learnings vanish between sessions | Patterns persist in local SQLite; skills improve over time |
+| Locked to one model provider | Switch with a flag; assign different models per role |
+| Your data lives in someone else's cloud | Everything stays on your machine; export anytime |
 
 ## Core Design Principles
 
@@ -26,7 +44,7 @@ That's it. OpenKoi detects your API keys from the environment, picks the best av
 
 ## Why Rust?
 
-OpenKoi is written in Rust to deliver a premium CLI experience that respects your time and resources:
+OpenKoi is written in Rust to deliver a CLI experience that respects your time and resources:
 
 | Metric | OpenKoi (Rust) | Typical TS/Python CLI |
 |--------|---------------|----------------------|
@@ -44,7 +62,7 @@ OpenKoi's architecture centers on an **Orchestrator** that coordinates all subsy
 
 ```
                     ┌─────────────────┐
-                    │   Orchestrator   │
+                    │   Orchestrator  │
                     └────────┬────────┘
          ┌──────────┬───────┼───────┬──────────┐
          ▼          ▼       ▼       ▼          ▼

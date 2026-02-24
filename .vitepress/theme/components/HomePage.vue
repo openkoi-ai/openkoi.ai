@@ -94,16 +94,17 @@ const currentStage = computed(() => loopStep.value % 4)
       <section class="hero">
         <div class="hero-left">
           <p class="hero-label">Self-iterating AI agent</p>
-          <h1>The engine that<br/><span class="accent">doesn't stop</span><br/>until it's right.</h1>
-          <p class="hero-sub">Standalone Rust binary. Plan-Execute-Evaluate-Refine loop.<br/>No runtime dependencies. No hand-holding.</p>
+          <h1>Stop babysitting<br/><span class="accent">your AI.</span><br/>OpenKoi iterates.</h1>
+          <p class="hero-sub">AI coding tools generate a first draft and leave you to fix it. OpenKoi reviews its own work — iterating until quality thresholds are met.<br/>Single Rust binary. Zero dependencies. Any model.</p>
 
           <div class="hero-actions">
-            <a href="/guide/introduction" class="btn-primary">Get Started</a>
+            <a href="/guide/installation" class="btn-primary">Install OpenKoi →</a>
             <div class="install-widget" @click="copyInstall" :class="{ copied: copied }">
               <span class="pw">$</span>
               <code>curl -fsSL https://openkoi.ai/install.sh | sh</code>
               <span class="copy-label">{{ copied ? 'Copied' : 'Copy' }}</span>
             </div>
+            <a href="https://github.com/openkoi-ai/openkoi" target="_blank" class="btn-github">⭐ Star on GitHub</a>
           </div>
         </div>
 
@@ -142,10 +143,33 @@ const currentStage = computed(() => loopStep.value % 4)
         </div>
       </section>
 
+      <!-- The Problem (Villain) -->
+      <section class="section-problem">
+        <h2>The status quo</h2>
+        <p class="section-sub">Current AI coding tools generate output and stop. You become the reviewer, the debugger, the QA team — on top of being the developer.</p>
+        <div class="problem-grid">
+          <div class="problem-item">
+            <span class="problem-icon">🔄</span>
+            <h3>Manual iteration</h3>
+            <p>You re-prompt corrections 3–5 times per task. The AI generates; you iterate.</p>
+          </div>
+          <div class="problem-item">
+            <span class="problem-icon">💸</span>
+            <h3>Wasted tokens</h3>
+            <p>You pay for rounds of manual back-and-forth that a system should handle automatically.</p>
+          </div>
+          <div class="problem-item">
+            <span class="problem-icon">🧠</span>
+            <h3>Lost learnings</h3>
+            <p>Patterns from today's work vanish tomorrow. You re-teach the same corrections every session.</p>
+          </div>
+        </div>
+      </section>
+
       <!-- How It Works — iteration loop -->
       <section id="how-it-works" class="section-how">
-        <h2>How it works</h2>
-        <p class="section-sub">OpenKoi follows a rigorous loop. It critiques its own work using domain-specific rubrics until quality thresholds are met.</p>
+        <h2>OpenKoi reviews its own work</h2>
+        <p class="section-sub">Instead of generating and stopping, OpenKoi follows a rigorous iteration loop. It evaluates its own output against domain-specific rubrics — and refines until quality thresholds are met.</p>
 
         <div class="loop-track">
           <div
@@ -254,6 +278,39 @@ const currentStage = computed(() => loopStep.value % 4)
         </transition>
       </section>
 
+      <!-- What Changes (Success / Transformation) -->
+      <section class="section-transform">
+        <h2>What changes</h2>
+        <p class="section-sub">From babysitting your AI agent to shipping code that's already been reviewed.</p>
+        <div class="transform-grid">
+          <div class="transform-item">
+            <div class="transform-before">You manually review every AI output</div>
+            <div class="transform-arrow">→</div>
+            <div class="transform-after">OpenKoi evaluates its own work against rubrics</div>
+          </div>
+          <div class="transform-item">
+            <div class="transform-before">You re-prompt corrections 3–5 times</div>
+            <div class="transform-arrow">→</div>
+            <div class="transform-after">Automatic iteration — stops when quality threshold is met</div>
+          </div>
+          <div class="transform-item">
+            <div class="transform-before">Learnings vanish between sessions</div>
+            <div class="transform-arrow">→</div>
+            <div class="transform-after">Patterns persist locally; skills improve over time</div>
+          </div>
+          <div class="transform-item">
+            <div class="transform-before">Locked to one provider</div>
+            <div class="transform-arrow">→</div>
+            <div class="transform-after">Switch with a flag; different models per role</div>
+          </div>
+          <div class="transform-item">
+            <div class="transform-before">Data on someone else's cloud</div>
+            <div class="transform-arrow">→</div>
+            <div class="transform-after">Everything stays on your machine</div>
+          </div>
+        </div>
+      </section>
+
       <!-- Works With — text grid, no fake logos -->
       <section class="section-ecosystem">
         <h2>Works with</h2>
@@ -299,7 +356,7 @@ const currentStage = computed(() => loopStep.value % 4)
         </div>
       </section>
 
-      <!-- Quick Start -->
+      <!-- Quick Start (with 3-step plan) -->
       <section class="section-quickstart">
         <div class="qs-terminal">
           <div class="terminal-bar">
@@ -307,23 +364,20 @@ const currentStage = computed(() => loopStep.value % 4)
             <span class="terminal-title">quickstart</span>
           </div>
           <div class="terminal-body">
-            <div class="term-line visible prompt"><span class="term-text"><span class="comment"># Install</span></span></div>
+            <div class="term-line visible prompt"><span class="term-text"><span class="comment"># 1. Install</span></span></div>
             <div class="term-line visible prompt"><span class="term-text">$ curl -fsSL https://openkoi.ai/install.sh | sh</span></div>
             <div class="term-line visible output"><span class="term-text">&nbsp;</span></div>
-            <div class="term-line visible prompt"><span class="term-text"><span class="comment"># Or via cargo</span></span></div>
-            <div class="term-line visible prompt"><span class="term-text">$ cargo install openkoi</span></div>
+            <div class="term-line visible prompt"><span class="term-text"><span class="comment"># 2. Run — API keys are detected automatically</span></span></div>
+            <div class="term-line visible prompt"><span class="term-text">$ openkoi "refactor auth module to use JWT"</span></div>
             <div class="term-line visible output"><span class="term-text">&nbsp;</span></div>
-            <div class="term-line visible prompt"><span class="term-text"><span class="comment"># Run</span></span></div>
-            <div class="term-line visible prompt"><span class="term-text">$ openkoi "write a REST API for user auth"</span></div>
-            <div class="term-line visible output"><span class="term-text">&nbsp;</span></div>
-            <div class="term-line visible prompt"><span class="term-text"><span class="comment"># Interactive mode</span></span></div>
-            <div class="term-line visible prompt"><span class="term-text">$ openkoi</span></div>
+            <div class="term-line visible prompt"><span class="term-text"><span class="comment"># 3. Ship — it iterates until the code passes review</span></span></div>
+            <div class="term-line visible prompt"><span class="term-text">$ openkoi status --live</span></div>
           </div>
         </div>
         <div class="qs-text">
-          <h2>Get started in seconds</h2>
-          <p>One command to install. One command to run. OpenKoi discovers your API keys from environment variables, config files, and keychains automatically.</p>
-          <a href="/guide/installation" class="btn-secondary">Installation Guide</a>
+          <h2>Three steps to ship</h2>
+          <p><strong>Install</strong> with one command. <strong>Run</strong> by describing what you want — OpenKoi discovers your API keys from environment variables, CLI tools, and keychains automatically. <strong>Ship</strong> code that's already been through the iteration loop.</p>
+          <a href="/guide/installation" class="btn-primary">Install OpenKoi →</a>
           <a href="/guide/cli-reference" class="btn-secondary">CLI Reference</a>
         </div>
       </section>
@@ -337,7 +391,7 @@ const currentStage = computed(() => loopStep.value % 4)
             <img src="/logo.png" alt="OpenKoi" />
             <span class="brand">OpenKoi</span>
           </a>
-          <p>Self-iterating AI agent. Built with Rust.</p>
+          <p>AI coding agent that reviews its own work. Built with Rust.</p>
           <div class="footer-social">
             <a href="https://github.com/openkoi-ai/openkoi" target="_blank" aria-label="GitHub">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
@@ -545,6 +599,25 @@ const currentStage = computed(() => loopStep.value % 4)
   color: var(--koi-text);
 }
 
+.btn-github {
+  display: inline-block;
+  padding: 10px 24px;
+  border: 1px solid var(--koi-border);
+  color: var(--koi-muted);
+  font-weight: 500;
+  font-size: 14px;
+  text-decoration: none;
+  border-radius: 8px;
+  font-family: var(--mono);
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.btn-github:hover {
+  border-color: #eab308;
+  color: #eab308;
+  background: rgba(234, 179, 8, 0.06);
+}
+
 /* Install widget */
 .install-widget {
   display: flex;
@@ -696,6 +769,116 @@ const currentStage = computed(() => loopStep.value % 4)
 
 @keyframes blink {
   50% { opacity: 0; }
+}
+
+/* ===== Problem Section (Villain) ===== */
+.section-problem {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 100px 40px 60px;
+}
+
+.section-problem h2 {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 16px;
+}
+
+.problem-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 36px;
+}
+
+.problem-item {
+  background: var(--koi-card);
+  border: 1px solid var(--koi-border);
+  border-radius: 10px;
+  padding: 28px;
+  transition: border-color 0.2s;
+}
+
+.problem-item:hover {
+  border-color: #ef4444;
+}
+
+.problem-icon {
+  font-size: 28px;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.problem-item h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  color: #fca5a5;
+}
+
+.problem-item p {
+  font-size: 14px;
+  color: var(--koi-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ===== Transformation Section (Success) ===== */
+.section-transform {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 100px 40px;
+}
+
+.section-transform h2 {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 16px;
+}
+
+.transform-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 36px;
+}
+
+.transform-item {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 20px;
+  align-items: center;
+  background: var(--koi-card);
+  border: 1px solid var(--koi-border);
+  border-radius: 10px;
+  padding: 20px 28px;
+  transition: border-color 0.2s;
+}
+
+.transform-item:hover {
+  border-color: var(--koi-muted);
+}
+
+.transform-before {
+  font-size: 14px;
+  color: #fca5a5;
+  font-family: var(--mono);
+  text-decoration: line-through;
+  text-decoration-color: rgba(252, 165, 165, 0.3);
+}
+
+.transform-arrow {
+  font-size: 18px;
+  color: var(--koi-orange);
+  font-weight: 700;
+}
+
+.transform-after {
+  font-size: 14px;
+  color: #86efac;
+  font-family: var(--mono);
 }
 
 /* ===== How It Works ===== */
@@ -1128,8 +1311,19 @@ const currentStage = computed(() => loopStep.value % 4)
 
   .features-row,
   .cap-grid,
-  .eco-grid {
+  .eco-grid,
+  .problem-grid {
     grid-template-columns: 1fr;
+  }
+
+  .transform-item {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .transform-arrow {
+    transform: rotate(90deg);
   }
 
   .section-quickstart {
@@ -1191,7 +1385,9 @@ const currentStage = computed(() => loopStep.value % 4)
   .section-how,
   .section-caps,
   .section-ecosystem,
-  .section-quickstart {
+  .section-quickstart,
+  .section-problem,
+  .section-transform {
     padding: 60px 16px;
   }
 
@@ -1200,7 +1396,8 @@ const currentStage = computed(() => loopStep.value % 4)
   }
 
   .features-row,
-  .cap-grid {
+  .cap-grid,
+  .problem-grid {
     grid-template-columns: 1fr;
   }
 

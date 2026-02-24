@@ -2,14 +2,14 @@ import { defineConfig } from 'vitepress'
 
 export default defineConfig({
     title: "OpenKoi",
-    description: "The AI Agent that Iterates to Perfection.",
+    description: "Stop babysitting your AI. OpenKoi iterates until the code is right.",
     head: [
         ['link', { rel: 'icon', type: 'image/png', href: '/logo.png' }],
         ['meta', { name: 'theme-color', content: '#ea580c' }],
         // Open Graph
         ['meta', { property: 'og:type', content: 'website' }],
-        ['meta', { property: 'og:title', content: 'OpenKoi — The AI Agent that Iterates to Perfection' }],
-        ['meta', { property: 'og:description', content: 'Self-iterating AI agent in Rust. Plan-Execute-Evaluate-Refine loop, 11 providers, pattern mining, local-first. <10ms startup, ~5MB memory.' }],
+        ['meta', { property: 'og:title', content: 'OpenKoi — Stop babysitting your AI.' }],
+        ['meta', { property: 'og:description', content: 'AI coding tools generate drafts and stop. OpenKoi reviews its own work — iterating until quality thresholds are met. Single Rust binary, local-first, any model.' }],
         ['meta', { property: 'og:image', content: 'https://openkoi.ai/images/og-image.png' }],
         ['meta', { property: 'og:image:width', content: '1200' }],
         ['meta', { property: 'og:image:height', content: '630' }],
@@ -17,8 +17,8 @@ export default defineConfig({
         ['meta', { property: 'og:site_name', content: 'OpenKoi' }],
         // Twitter Card
         ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
-        ['meta', { name: 'twitter:title', content: 'OpenKoi — The AI Agent that Iterates to Perfection' }],
-        ['meta', { name: 'twitter:description', content: 'Self-iterating AI agent in Rust. Plan-Execute-Evaluate-Refine loop, 11 providers, pattern mining, local-first.' }],
+        ['meta', { name: 'twitter:title', content: 'OpenKoi — Stop babysitting your AI.' }],
+        ['meta', { name: 'twitter:description', content: 'AI coding tools generate drafts and stop. OpenKoi reviews its own work — iterating until quality thresholds are met.' }],
         ['meta', { name: 'twitter:image', content: 'https://openkoi.ai/images/og-image.png' }]
     ],
     themeConfig: {
