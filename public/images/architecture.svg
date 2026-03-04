@@ -13,113 +13,102 @@
   <rect width="1200" height="630" fill="#0a0a0a"/>
 
   <!-- Title -->
-  <text x="600" y="50" text-anchor="middle" fill="#e4e4e7" font-size="26" font-weight="700">OpenKoi Architecture</text>
-  <text x="600" y="75" text-anchor="middle" fill="#71717a" font-size="13">Single binary. Local-first. Modular core.</text>
+  <text x="600" y="45" text-anchor="middle" fill="#e4e4e7" font-size="24" font-weight="700">OpenKoi Cognitive Architecture (EFaaS)</text>
+  <text x="600" y="68" text-anchor="middle" fill="#71717a" font-size="12">Sovereign-Parliament stack. Local world model. Graduated autonomy.</text>
 
-  <!-- CLI Layer -->
-  <rect x="400" y="100" width="400" height="50" rx="8" fill="#141416" stroke="#ea580c" stroke-width="2"/>
-  <text x="600" y="132" text-anchor="middle" fill="#ea580c" font-size="14" font-weight="700">CLI  (clap + ratatui)</text>
+  <!-- CLI / Nervous System -->
+  <rect x="400" y="90" width="400" height="40" rx="6" fill="#141416" stroke="#ea580c" stroke-width="2"/>
+  <text x="600" y="115" text-anchor="middle" fill="#ea580c" font-size="13" font-weight="700">CLI: The Nervous System (koi think, soul, reflect...)</text>
 
-  <!-- Arrow down -->
-  <line x1="600" y1="150" x2="600" y2="180" stroke="#52525b" stroke-width="1.5" marker-end="url(#a)"/>
+  <!-- SOVEREIGN / Identity -->
+  <rect x="150" y="160" width="220" height="100" rx="8" fill="#141416" stroke="#71717a" stroke-width="2"/>
+  <text x="260" y="185" text-anchor="middle" fill="#e4e4e7" font-size="14" font-weight="700">SOVEREIGN</text>
+  <text x="260" y="205" text-anchor="middle" fill="#71717a" font-size="11">Identity Layer</text>
+  <line x1="170" y1="215" x2="350" y2="215" stroke="#27272a" stroke-width="1"/>
+  <text x="260" y="232" text-anchor="middle" fill="#ea580c" font-size="11" font-weight="500">Sovereign Directive</text>
+  <text x="260" y="245" text-anchor="middle" fill="#71717a" font-size="10">Situational intent framing</text>
 
-  <!-- Orchestrator -->
-  <rect x="350" y="185" width="500" height="50" rx="8" fill="#141416" stroke="#22d3ee" stroke-width="2"/>
-  <text x="600" y="217" text-anchor="middle" fill="#22d3ee" font-size="14" font-weight="700">Orchestrator  (Plan → Execute → Evaluate → Refine)</text>
+  <!-- PARLIAMENT / Judgment -->
+  <rect x="420" y="160" width="550" height="100" rx="8" fill="#141416" stroke="#22d3ee" stroke-width="2"/>
+  <text x="695" y="185" text-anchor="middle" fill="#22d3ee" font-size="14" font-weight="700">PARLIAMENT of MIND</text>
+  
+  <!-- Agencies -->
+  <g transform="translate(440, 200)">
+    <rect width="90" height="45" rx="4" fill="#1a1a1c" stroke="#27272a"/>
+    <text x="45" y="25" text-anchor="middle" fill="#e4e4e7" font-size="10">Architect</text>
+  </g>
+  <g transform="translate(540, 200)">
+    <rect width="100" height="45" rx="4" fill="#1a1a1c" stroke="#27272a"/>
+    <text x="50" y="25" text-anchor="middle" fill="#e4e4e7" font-size="10">Investigator</text>
+  </g>
+  <g transform="translate(650, 200)">
+    <rect width="90" height="45" rx="4" fill="#1a1a1c" stroke="#27272a"/>
+    <text x="45" y="25" text-anchor="middle" fill="#e4e4e7" font-size="10">Critic</text>
+  </g>
+  <g transform="translate(750, 200)">
+    <rect width="100" height="45" rx="4" fill="#1a1a1c" stroke="#27272a"/>
+    <text x="50" y="25" text-anchor="middle" fill="#e4e4e7" font-size="10">Pragmatist</text>
+  </g>
+  <g transform="translate(860, 200)">
+    <rect width="90" height="45" rx="4" fill="#1a1a1c" stroke="#ef4444" stroke-dasharray="2 2"/>
+    <text x="45" y="25" text-anchor="middle" fill="#ef4444" font-size="10">Guardian</text>
+  </g>
 
-  <!-- Arrows down to 4 core modules -->
-  <line x1="280" y1="235" x2="280" y2="270" stroke="#52525b" stroke-width="1.5" marker-end="url(#a)"/>
-  <line x1="480" y1="235" x2="480" y2="270" stroke="#52525b" stroke-width="1.5" marker-end="url(#a)"/>
-  <line x1="680" y1="235" x2="680" y2="270" stroke="#52525b" stroke-width="1.5" marker-end="url(#a)"/>
-  <line x1="920" y1="235" x2="920" y2="270" stroke="#52525b" stroke-width="1.5" marker-end="url(#a)"/>
+  <!-- Connection: CLI -> Deliberation -->
+  <line x1="600" y1="130" x2="600" y2="155" stroke="#52525b" stroke-width="1.5" marker-end="url(#a)"/>
+  <line x1="370" y1="210" x2="415" y2="210" stroke="#52525b" stroke-width="1.5" stroke-dasharray="3 2" marker-end="url(#a)"/>
 
-  <!-- Core modules row -->
-  <!-- Planner -->
-  <rect x="180" y="275" width="190" height="70" rx="8" fill="#141416" stroke="#27272a" stroke-width="1"/>
-  <text x="275" y="300" text-anchor="middle" fill="#e4e4e7" font-size="13" font-weight="700">Planner</text>
-  <text x="275" y="318" text-anchor="middle" fill="#71717a" font-size="11">Skill selection</text>
-  <text x="275" y="333" text-anchor="middle" fill="#71717a" font-size="11">Strategy building</text>
+  <!-- ORCHESTRATOR / Worker -->
+  <rect x="350" y="290" width="500" height="60" rx="8" fill="#141416" stroke="#a855f7" stroke-width="2"/>
+  <text x="600" y="320" text-anchor="middle" fill="#a855f7" font-size="14" font-weight="700">ORCHESTRATOR (PEER Loop)</text>
+  <text x="600" y="340" text-anchor="middle" fill="#71717a" font-size="11">Plan → Execute → Evaluate → Refine</text>
 
-  <!-- Executor -->
-  <rect x="390" y="275" width="190" height="70" rx="8" fill="#141416" stroke="#27272a" stroke-width="1"/>
-  <text x="485" y="300" text-anchor="middle" fill="#e4e4e7" font-size="13" font-weight="700">Executor</text>
-  <text x="485" y="318" text-anchor="middle" fill="#71717a" font-size="11">LLM calls</text>
-  <text x="485" y="333" text-anchor="middle" fill="#71717a" font-size="11">Delta on iter 2+</text>
+  <!-- Connection: Parliament -> Orchestrator -->
+  <line x1="695" y1="260" x2="600" y2="285" stroke="#52525b" stroke-width="1.5" marker-end="url(#a)"/>
 
-  <!-- Evaluator -->
-  <rect x="600" y="275" width="190" height="70" rx="8" fill="#141416" stroke="#27272a" stroke-width="1"/>
-  <text x="695" y="300" text-anchor="middle" fill="#e4e4e7" font-size="13" font-weight="700">Evaluator</text>
-  <text x="695" y="318" text-anchor="middle" fill="#71717a" font-size="11">Rubric scoring</text>
-  <text x="695" y="333" text-anchor="middle" fill="#71717a" font-size="11">6 built-in rubrics</text>
+  <!-- SUBSTRATE / World Model -->
+  <rect x="150" y="380" width="900" height="100" rx="8" fill="#141416" stroke="#27272a" stroke-width="1"/>
+  <text x="600" y="405" text-anchor="middle" fill="#22d3ee" font-size="14" font-weight="700">SUBSTRATE (World Model)</text>
+  
+  <!-- Atlases -->
+  <g transform="translate(200, 420)">
+    <rect width="240" height="40" rx="6" fill="#1a1a1c" stroke="#a855f7" stroke-width="1"/>
+    <text x="120" y="25" text-anchor="middle" fill="#e4e4e7" font-size="11">Tool Atlas (reliability, failure modes)</text>
+  </g>
+  <g transform="translate(480, 420)">
+    <rect width="240" height="40" rx="6" fill="#1a1a1c" stroke="#ea580c" stroke-width="1"/>
+    <text x="120" y="25" text-anchor="middle" fill="#e4e4e7" font-size="11">Domain Atlas (patterns, skills, FTS5)</text>
+  </g>
+  <g transform="translate(760, 420)">
+    <rect width="240" height="40" rx="6" fill="#1a1a1c" stroke="#22d3ee" stroke-width="1"/>
+    <text x="120" y="25" text-anchor="middle" fill="#e4e4e7" font-size="11">Human Atlas (preferences, context)</text>
+  </g>
 
-  <!-- Learner -->
-  <rect x="820" y="275" width="190" height="70" rx="8" fill="#141416" stroke="#27272a" stroke-width="1"/>
-  <text x="915" y="300" text-anchor="middle" fill="#e4e4e7" font-size="13" font-weight="700">Learner</text>
-  <text x="915" y="318" text-anchor="middle" fill="#71717a" font-size="11">Pattern mining</text>
-  <text x="915" y="333" text-anchor="middle" fill="#71717a" font-size="11">Skill proposer</text>
+  <!-- Connection: Substrate <-> Orchestrator -->
+  <line x1="550" y1="375" x2="550" y2="355" stroke="#52525b" stroke-width="1.5" marker-end="url(#a)"/>
+  <line x1="650" y1="355" x2="650" y2="375" stroke="#52525b" stroke-width="1.5" marker-end="url(#a)"/>
 
-  <!-- Arrows down to infra layer -->
-  <line x1="275" y1="345" x2="275" y2="380" stroke="#52525b" stroke-width="1" marker-end="url(#a)"/>
-  <line x1="485" y1="345" x2="485" y2="380" stroke="#52525b" stroke-width="1" marker-end="url(#a)"/>
-  <line x1="695" y1="345" x2="695" y2="380" stroke="#52525b" stroke-width="1" marker-end="url(#a)"/>
-  <line x1="915" y1="345" x2="915" y2="380" stroke="#52525b" stroke-width="1" marker-end="url(#a)"/>
-
-  <!-- Infrastructure layer -->
-  <!-- Memory -->
-  <rect x="100" y="385" width="200" height="80" rx="8" fill="#141416" stroke="#27272a" stroke-width="1"/>
-  <text x="200" y="410" text-anchor="middle" fill="#a855f7" font-size="12" font-weight="700">Memory</text>
-  <text x="200" y="428" text-anchor="middle" fill="#71717a" font-size="11">SQLite + sqlite-vec</text>
-  <text x="200" y="443" text-anchor="middle" fill="#71717a" font-size="11">5 layers, FTS5</text>
-  <text x="200" y="458" text-anchor="middle" fill="#71717a" font-size="11">Confidence decay</text>
-
-  <!-- Providers -->
-  <rect x="320" y="385" width="200" height="80" rx="8" fill="#141416" stroke="#27272a" stroke-width="1"/>
-  <text x="420" y="410" text-anchor="middle" fill="#ea580c" font-size="12" font-weight="700">Providers</text>
-  <text x="420" y="428" text-anchor="middle" fill="#71717a" font-size="11">11 AI providers</text>
-  <text x="420" y="443" text-anchor="middle" fill="#71717a" font-size="11">Role-based routing</text>
-  <text x="420" y="458" text-anchor="middle" fill="#71717a" font-size="11">Fallback chains</text>
-
-  <!-- Integrations -->
-  <rect x="540" y="385" width="200" height="80" rx="8" fill="#141416" stroke="#27272a" stroke-width="1"/>
-  <text x="640" y="410" text-anchor="middle" fill="#22d3ee" font-size="12" font-weight="700">Integrations</text>
-  <text x="640" y="428" text-anchor="middle" fill="#71717a" font-size="11">10 apps</text>
-  <text x="640" y="443" text-anchor="middle" fill="#71717a" font-size="11">Messaging + Document</text>
-  <text x="640" y="458" text-anchor="middle" fill="#71717a" font-size="11">Auto-registered tools</text>
-
-  <!-- Plugins -->
-  <rect x="760" y="385" width="200" height="80" rx="8" fill="#141416" stroke="#27272a" stroke-width="1"/>
-  <text x="860" y="410" text-anchor="middle" fill="#eab308" font-size="12" font-weight="700">Plugins</text>
-  <text x="860" y="428" text-anchor="middle" fill="#71717a" font-size="11">MCP servers</text>
-  <text x="860" y="443" text-anchor="middle" fill="#71717a" font-size="11">WASM (wasmtime)</text>
-  <text x="860" y="458" text-anchor="middle" fill="#71717a" font-size="11">Rhai scripts</text>
-
-  <!-- Soul -->
-  <rect x="980" y="385" width="120" height="80" rx="8" fill="#141416" stroke="#27272a" stroke-width="1"/>
-  <text x="1040" y="410" text-anchor="middle" fill="#71717a" font-size="12" font-weight="700">Soul</text>
-  <text x="1040" y="428" text-anchor="middle" fill="#71717a" font-size="11">Identity</text>
-  <text x="1040" y="443" text-anchor="middle" fill="#71717a" font-size="11">Evolves</text>
-
-  <!-- Bottom: key tech -->
-  <line x1="100" y1="500" x2="1100" y2="500" stroke="#27272a" stroke-width="1"/>
-
-  <rect x="120" y="520" width="140" height="36" rx="6" fill="rgba(234,88,12,0.08)" stroke="#27272a" stroke-width="1"/>
-  <text x="190" y="543" text-anchor="middle" fill="#ea580c" font-size="12" font-weight="500">Rust + Tokio</text>
-
-  <rect x="280" y="520" width="140" height="36" rx="6" fill="rgba(34,211,238,0.08)" stroke="#27272a" stroke-width="1"/>
-  <text x="350" y="543" text-anchor="middle" fill="#22d3ee" font-size="12" font-weight="500">rustls TLS</text>
-
-  <rect x="440" y="520" width="160" height="36" rx="6" fill="rgba(168,85,247,0.08)" stroke="#27272a" stroke-width="1"/>
-  <text x="520" y="543" text-anchor="middle" fill="#a855f7" font-size="12" font-weight="500">SQLite bundled</text>
-
-  <rect x="620" y="520" width="140" height="36" rx="6" fill="rgba(234,179,8,0.08)" stroke="#27272a" stroke-width="1"/>
-  <text x="690" y="543" text-anchor="middle" fill="#eab308" font-size="12" font-weight="500">wasmtime</text>
-
-  <rect x="780" y="520" width="140" height="36" rx="6" fill="rgba(234,88,12,0.08)" stroke="#27272a" stroke-width="1"/>
-  <text x="850" y="543" text-anchor="middle" fill="#ea580c" font-size="12" font-weight="500">minijinja</text>
-
-  <rect x="940" y="520" width="140" height="36" rx="6" fill="rgba(34,211,238,0.08)" stroke="#27272a" stroke-width="1"/>
-  <text x="1010" y="543" text-anchor="middle" fill="#22d3ee" font-size="12" font-weight="500">CalVer</text>
+  <!-- Graduated Trust & Autonomy -->
+  <line x1="200" y1="510" x2="1000" y2="510" stroke="#27272a" stroke-width="1"/>
+  <text x="600" y="535" text-anchor="middle" fill="#71717a" font-size="12" font-weight="700">AUTONOMY STACK</text>
+  
+  <g transform="translate(250, 550)">
+    <text x="0" y="15" fill="#71717a" font-size="11">Shadow</text>
+    <rect x="50" y="0" width="100" height="20" rx="4" fill="#1a1a1c" stroke="#27272a"/>
+  </g>
+  <g transform="translate(400, 550)">
+    <text x="0" y="15" fill="#e4e4e7" font-size="11">Supervised</text>
+    <rect x="80" y="0" width="100" height="20" rx="4" fill="#22d3ee" stroke="#22d3ee" fill-opacity="0.2"/>
+  </g>
+  <g transform="translate(560, 550)">
+    <text x="0" y="15" fill="#71717a" font-size="11">Autonomous</text>
+    <rect x="80" y="0" width="100" height="20" rx="4" fill="#1a1a1c" stroke="#27272a"/>
+  </g>
+  <g transform="translate(740, 550)">
+    <text x="0" y="15" fill="#71717a" font-size="11">Trusted</text>
+    <rect x="60" y="0" width="100" height="20" rx="4" fill="#1a1a1c" stroke="#27272a"/>
+  </g>
 
   <!-- Branding -->
-  <text x="600" y="600" text-anchor="middle" fill="#52525b" font-size="13">openkoi.ai</text>
+  <text x="600" y="605" text-anchor="middle" fill="#52525b" font-size="13">openkoi.ai</text>
 </svg>
