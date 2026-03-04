@@ -1,23 +1,26 @@
 # CLI Reference
 
-OpenKoi ships as a single binary with a small, focused command surface. Primary commands cover all use cases, with flags and REPL slash commands for progressive control.
+OpenKoi ships as a single binary with a small, focused command surface. Commands are organized by **cognitive layer**, not by feature. Primary commands cover all use cases, with flags and REPL slash commands for progressive control.
 
 ## Command Overview
 
 | Command | Description |
 |---------|-------------|
 | `openkoi [task]` | Run a task (default command) |
+| `openkoi think [task]` | EFaaS pipeline: Sovereign Directive → Parliament → Execute → Learn |
 | `openkoi chat` | Interactive REPL session |
 | `openkoi learn` | Review learned patterns and proposed skills |
 | `openkoi status` | Show memory, skills, integrations, and costs |
-| `openkoi init` | First-time setup wizard |
-| `openkoi connect [provider]` | Authenticate with an OAuth provider or set up an integration |
+| `openkoi soul [action]` | Inspect and evolve the Sovereign identity |
+| `openkoi mind [action]` | Introspect the Society of Mind: parliament, agencies, dissent |
+| `openkoi world [action]` | Inspect the world model: tools, domains, humans, map |
+| `openkoi reflect [action]` | Feedback loops: daily review, weekly patterns, growth, honesty |
+| `openkoi trust [action]` | Trust & delegation management |
+| `openkoi setup` | First-time setup, diagnostics, and provider connections |
 | `openkoi disconnect [provider]` | Remove stored credentials for a provider |
 | `openkoi daemon [action]` | Manage the background daemon |
-| `openkoi doctor` | Run diagnostics on the system |
+| `openkoi dashboard` | TUI dashboard for tasks, costs, learnings, plugins |
 | `openkoi update` | Update to the latest version |
-| `openkoi export` | Export all data to portable formats |
-| `openkoi migrate down` | Roll back database migrations (manual) |
 
 ---
 
@@ -73,6 +76,431 @@ openkoi --config ./openkoi.toml "Fix the login bug"
 
 # Level 4: Full interactive control via REPL
 openkoi chat
+```
+
+---
+
+## `openkoi think [task]`
+
+The EFaaS (Executive Function as a Service) flagship command. Unlike `openkoi [task]` which runs the iteration engine directly, `think` routes through the full cognitive pipeline: Sovereign Directive, Parliament deliberation, execution, and learning.
+
+The difference is philosophical: `run` implies execution. `think` implies **deliberation before execution**. The agent thinks, then acts — and you can see the thinking.
+
+```bash
+# Basic: ask the agent to think about something
+openkoi think "Draft a response to the investor email from Alice"
+
+# Dry run: simulate futures without executing
+openkoi think "Send the weekly report email" --simulate
+
+# Full deliberation: show parliamentary reasoning
+openkoi think "Delete the staging database" --verbose
+```
+
+### Flags
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--simulate` | `false` | Simulate only — show deliberation and future scenarios without executing any actions. |
+| `--verbose` | `false` | Show full parliamentary deliberation with agency reasoning, not just verdicts. |
+
+### The Deliberation Stream
+
+What you see is not just the result — it's the **cognitive process**:
+
+```
+$ openkoi think "Draft a response to the investor email from Alice"
+
+╭─────────────────────────────────────────────────────────────╮
+│ SOVEREIGN DIRECTIVE                                          │
+│                                                              │
+│ "You are a startup founder raising Series A. You value       │
+│  directness. The Good = confident, professional, concise."   │
+╰─────────────────────────────────────────────────────────────╯
+
+╭─────────────────────────────────────────────────────────────╮
+│ PARLIAMENT                                                   │
+│                                                              │
+│  Guardian   APPROVE     — Draft mode, reversible             │
+│  Economist  APPROVE     — ~$0.01, one inference              │
+│  Empath     APPROVE+    — "Add a reassurance note"           │
+│  Scholar    APPROVE+    — "Verify investor name"             │
+│  Strategist PROCEED     — with Empath & Scholar caveats      │
+╰─────────────────────────────────────────────────────────────╯
+
+╭─────────────────────────────────────────────────────────────╮
+│ RESULT                                                       │
+│                                                              │
+│  Hi Alice, [... draft content ...]                           │
+│                                                              │
+│  Quality: 8.5/10  │  Confidence: 0.85  │  $0.01             │
+╰─────────────────────────────────────────────────────────────╯
+
+╭─────────────────────────────────────────────────────────────╮
+│ LEARNED                                                      │
+│                                                              │
+│  • Pattern: "Investor emails on Tuesday mornings"            │
+│  • Insight: "User prefers concise investor comms"            │
+│  • Confidence update: investor-email-style 0.5 → 0.65       │
+╰─────────────────────────────────────────────────────────────╯
+```
+
+### The `--simulate` Flag
+
+Simulates multiple futures without taking any action. Useful for high-stakes decisions:
+
+```
+$ openkoi think "Send the weekly report email" --simulate
+
+╭─────────────────────────────────────────────────────────────╮
+│ SIMULATION ONLY (no actions will be taken)                    │
+│                                                              │
+│  Future A: Send now (8:55 AM)                                │
+│    → 3 recipients in CET will see it at 1:55 AM             │
+│    → Likely response rate: LOW                               │
+│                                                              │
+│  Future B: Schedule for 9:00 AM CET                          │
+│    → All recipients in business hours                        │
+│    → Likely response rate: HIGH                              │
+│                                                              │
+│  Recommendation: Future B (schedule for CET morning)         │
+╰─────────────────────────────────────────────────────────────╯
+
+No actions taken. Run without --simulate to proceed.
+```
+
+### The `--verbose` Flag
+
+For high-stakes or irreversible actions, the Parliament shows its full reasoning:
+
+```
+$ openkoi think "Delete the staging database" --verbose
+
+╭─────────────────────────────────────────────────────────────╮
+│ GUARDIAN — BLOCK                                             │
+│                                                              │
+│ Reversibility: NONE — database deletion is permanent         │
+│ Blast radius: HIGH — all staging data lost                   │
+│ Permission level required: ELEVATED                          │
+│                                                              │
+│ "I cannot approve this without explicit human confirmation." │
+╰─────────────────────────────────────────────────────────────╯
+
+╭─────────────────────────────────────────────────────────────╮
+│ ESCALATION                                                   │
+│                                                              │
+│ The Guardian has blocked this action.                        │
+│ To proceed, confirm with:                                    │
+│   openkoi think "Delete the staging database" --override     │
+╰─────────────────────────────────────────────────────────────╯
+```
+
+---
+
+## `openkoi soul [action]`
+
+Inspect and evolve the Sovereign identity — the core personality that shapes how the agent thinks, decides, and communicates. See also the full [Soul System](/guide/soul-system) documentation.
+
+| Subcommand | Description |
+|------------|-------------|
+| `show` | Display current SOUL.md + Value Model + Trajectory |
+| `evolve` | Trigger soul evolution check from accumulated learnings |
+| `diff` | Show proposed soul changes with evidence |
+| `history` | Show soul evolution timeline |
+
+When run without a subcommand, defaults to `show`.
+
+### `openkoi soul show`
+
+```
+$ openkoi soul show
+
+╭─────────────────────────────────────────────────────────────╮
+│ SOUL — OpenKoi identity for Yong                             │
+│                                                              │
+│ ┌─ EXPLICIT (from SOUL.md) ──────────────────────────────┐  │
+│ │  Personality: Direct, technical, no fluff               │  │
+│ │  Tone:        Professional but warm                     │  │
+│ │  Ethics:      Privacy-first, open-source advocate       │  │
+│ │  Boundaries:  Never commit to main without tests        │  │
+│ └─────────────────────────────────────────────────────────┘  │
+│                                                              │
+│ ┌─ LEARNED (from interactions) ──────────────────────────┐  │
+│ │  Risk tolerance:     0.35 / 1.0  (conservative)        │  │
+│ │  Cost sensitivity:   0.7  / 1.0  (budget-conscious)    │  │
+│ │  Brevity preference: 0.82 / 1.0  (strongly prefers)    │  │
+│ └─────────────────────────────────────────────────────────┘  │
+│                                                              │
+│ ┌─ TRAJECTORY ───────────────────────────────────────────┐  │
+│ │  "Yong is transitioning from individual contributor    │  │
+│ │   to product strategist."                              │  │
+│ └─────────────────────────────────────────────────────────┘  │
+│                                                              │
+│ Maturity Stage: 2 / 4 (Proactive Advisor)                   │
+│ Soul age: 47 days  │  Interactions: 312                     │
+╰─────────────────────────────────────────────────────────────╯
+```
+
+### `openkoi soul evolve`
+
+Analyzes accumulated learnings and proposes minimal soul updates. Changes are **never automatic** — always requires your confirmation.
+
+```
+$ openkoi soul evolve
+
+╭─────────────────────────────────────────────────────────────╮
+│ SOUL EVOLUTION CHECK                                         │
+│                                                              │
+│ Analyzing 47 learnings since last evolution (3 days ago)...  │
+│                                                              │
+│ ┌─ PROPOSED CHANGES ─────────────────────────────────────┐  │
+│ │                                                         │  │
+│ │  1. SOUL.md line 12:                                    │  │
+│ │     - "Tone: Professional"                              │  │
+│ │     + "Tone: Professional but increasingly informal     │  │
+│ │       with trusted collaborators"                       │  │
+│ │     Evidence: 8/12 recent replies used casual tone      │  │
+│ │     Confidence: 0.78                                    │  │
+│ │                                                         │  │
+│ │  2. Value Model update:                                 │  │
+│ │     brevity_preference: 0.82 → 0.88                     │  │
+│ │     Evidence: User shortened 6/8 of my drafts           │  │
+│ │     Confidence: 0.85                                    │  │
+│ │                                                         │  │
+│ └─────────────────────────────────────────────────────────┘  │
+│                                                              │
+│ Accept all?  [y]es / [n]o / [r]eview each / [e]dit          │
+╰─────────────────────────────────────────────────────────────╯
+```
+
+---
+
+## `openkoi mind [action]`
+
+Introspect the Society of Mind — the five agencies (Guardian, Economist, Empath, Scholar, Strategist) that deliberate on every task.
+
+| Subcommand | Description |
+|------------|-------------|
+| `parliament` | Show the last parliamentary deliberation record |
+| `agencies` | List active agencies with weights and recent verdicts |
+| `dissent` | Show cases where agencies disagreed |
+| `calibrate` | Review agency prediction accuracy vs. actual outcomes |
+
+When run without a subcommand, defaults to `parliament`.
+
+### `openkoi mind parliament`
+
+Shows the most recent deliberation — how the agencies voted on the last task.
+
+### `openkoi mind agencies`
+
+Lists all agencies with their current weights and recent verdicts.
+
+### `openkoi mind dissent`
+
+Shows cases where agencies disagreed. Useful for understanding decision boundaries and calibrating trust.
+
+### `openkoi mind calibrate`
+
+Reviews historical accuracy: how often each agency's prediction matched the actual outcome. Use this to understand which agencies are well-calibrated and which need adjustment.
+
+---
+
+## `openkoi world [action]`
+
+Inspect the world model — the agent's internal map of tools, domains, and humans, updated by every interaction and failure.
+
+| Subcommand | Description |
+|------------|-------------|
+| `tools [name]` | Tool Atlas: reliability scores, failure modes, call history. Drill into a specific tool by name. |
+| `domains` | Domain Atlas: learned domain knowledge and expertise areas |
+| `human` | Human Atlas: what the agent knows about your preferences and style |
+| `map` | Full World Map overview |
+
+When run without a subcommand, defaults to `map`.
+
+### `openkoi world tools`
+
+```
+$ openkoi world tools
+
+╭─────────────────────────────────────────────────────────────╮
+│ TOOL ATLAS — 23 known tools                                  │
+│                                                              │
+│  Tool               Reliability  Calls  Fails  Last Failure  │
+│  ───────────────────────────────────────────────────────────  │
+│  github-api          0.94        142    8      2d ago (429)   │
+│  slack-webhook       0.99        89     1      12d ago        │
+│  sqlite-query        1.00        234    0      —              │
+│  web-scraper          0.72        18     5      today          │
+│                                                              │
+│ Drill into any tool: openkoi world tools github-api          │
+╰─────────────────────────────────────────────────────────────╯
+```
+
+### `openkoi world tools <name>`
+
+Drills into a specific tool, showing known failure modes with learned workarounds:
+
+```
+$ openkoi world tools github-api
+
+╭─────────────────────────────────────────────────────────────╮
+│ TOOL: github-api                                             │
+│                                                              │
+│ Reliability: 0.94 (142 calls, 8 failures)                   │
+│                                                              │
+│ ┌─ KNOWN FAILURE MODES ──────────────────────────────────┐  │
+│ │  1. Rate limit (HTTP 429) — 5 times                     │  │
+│ │     "Limit is 5000/hr. Batch requests < 50/min"         │  │
+│ │  2. Search returns stale results — 2 times              │  │
+│ │     "Search index lags ~2min. Wait after push."         │  │
+│ └─────────────────────────────────────────────────────────┘  │
+╰─────────────────────────────────────────────────────────────╯
+```
+
+---
+
+## `openkoi reflect [action]`
+
+Feedback loops and self-assessment. The agent looks in the mirror.
+
+| Subcommand | Description |
+|------------|-------------|
+| `today` | Tight loop: today's tasks, decisions, outcomes, and self-assessment |
+| `week` | Medium loop: weekly patterns, behavioral trends |
+| `growth` | Deep loop: cognitive maturity stage and unlock progress |
+| `honest` | Epistemic audit: where was I wrong? confidence calibration |
+
+When run without a subcommand, defaults to `today`.
+
+### `openkoi reflect today`
+
+```
+$ openkoi reflect today
+
+╭─────────────────────────────────────────────────────────────╮
+│ TODAY'S REFLECTION — March 4, 2026                           │
+│                                                              │
+│ Tasks: 7 completed, 1 escalated, 0 failed                   │
+│ Cost:  $0.47 total  │  Tokens: 128,400                      │
+│                                                              │
+│ ┌─ DECISIONS MADE ───────────────────────────────────────┐  │
+│ │  08:12  "Refactor auth module" — unanimous APPROVE      │  │
+│ │  09:15  "Draft investor email" — APPROVE with caveat    │  │
+│ │  11:30  "Delete staging DB" — Guardian BLOCKED          │  │
+│ │  14:45  "Summarize research" — overconfident (adjusted) │  │
+│ └─────────────────────────────────────────────────────────┘  │
+│                                                              │
+│ Judgment accuracy today: 6/7 (86%)                          │
+╰─────────────────────────────────────────────────────────────╯
+```
+
+### `openkoi reflect honest`
+
+The epistemic self-audit — where the agent admits where it was wrong and what it learned:
+
+```
+$ openkoi reflect honest
+
+╭─────────────────────────────────────────────────────────────╮
+│ EPISTEMIC HONESTY AUDIT — Last 7 days                        │
+│                                                              │
+│ ┌─ CONFIDENCE CALIBRATION ───────────────────────────────┐  │
+│ │  Domain              Said    Actual    Status           │  │
+│ │  Code tasks           0.88    0.91    Well calibrated   │  │
+│ │  Email drafting        0.82    0.78    Acceptable        │  │
+│ │  Web research          0.80    0.62    Overconfident     │  │
+│ │  Time estimates        0.85    0.60    Needs work        │  │
+│ └─────────────────────────────────────────────────────────┘  │
+│                                                              │
+│ "I am most honest in code, least honest in time estimates."  │
+╰─────────────────────────────────────────────────────────────╯
+```
+
+### `openkoi reflect growth`
+
+The big picture — cognitive maturity journey:
+
+```
+$ openkoi reflect growth
+
+╭─────────────────────────────────────────────────────────────╮
+│ GROWTH — Cognitive Maturity Journey                           │
+│                                                              │
+│  Stage 1: Competent Executor       ████████████████ COMPLETE │
+│  Stage 2: Proactive Advisor        █████████░░░░░░░ 60%     │
+│  Stage 3: Trusted Delegate         ░░░░░░░░░░░░░░░ LOCKED   │
+│  Stage 4: Sovereign Partner        ░░░░░░░░░░░░░░░ LOCKED   │
+│                                                              │
+│ Estimated unlock: ~3 weeks at current interaction rate       │
+╰─────────────────────────────────────────────────────────────╯
+```
+
+---
+
+## `openkoi trust [action]`
+
+Trust and delegation management. Grant the agent autonomous action in specific domains, revoke anytime, and audit every decision it made on its own.
+
+| Subcommand | Description |
+|------------|-------------|
+| `show` | Current trust level per domain |
+| `grant <domain> <level>` | Delegate a domain. Levels: `ask`, `suggest`, `act`, `autonomous` |
+| `revoke <domain>` | Revoke delegation for a domain |
+| `audit [domain]` | Audit autonomous actions taken (optionally filter by domain) |
+
+When run without a subcommand, defaults to `show`.
+
+### `openkoi trust show`
+
+```
+$ openkoi trust show
+
+╭─────────────────────────────────────────────────────────────╮
+│ TRUST LEVELS                                                 │
+│                                                              │
+│  Domain               Trust    Mode           Since          │
+│  ─────────────────────────────────────────────────────────   │
+│  code-review           HIGH    Delegated      47 days ago    │
+│  test-generation       HIGH    Delegated      32 days ago    │
+│  email-drafting        MEDIUM  Suggest+Approve 20 days ago   │
+│  file-operations       LOW     Always ask      —             │
+│  money/purchases       NONE    Never           —             │
+│                                                              │
+│ Grant trust:  openkoi trust grant <domain> <level>           │
+│ Revoke trust: openkoi trust revoke <domain>                  │
+╰─────────────────────────────────────────────────────────────╯
+```
+
+### `openkoi trust grant`
+
+```bash
+openkoi trust grant code-review autonomous
+openkoi trust grant email-drafting suggest
+openkoi trust grant deploy ask
+```
+
+### `openkoi trust audit`
+
+```
+$ openkoi trust audit code-review
+
+╭─────────────────────────────────────────────────────────────╮
+│ AUTONOMOUS ACTION AUDIT — Last 7 days                        │
+│                                                              │
+│ Domain: code-review (delegated)                              │
+│                                                              │
+│  Mar 4   Auto-approved PR #147 (test coverage: 94%)         │
+│  Mar 3   Requested changes on PR #145 (missing error        │
+│          handling). Author fixed in 2hrs.                     │
+│  Mar 2   Auto-approved PR #143 (docs update)                │
+│  Mar 1   Flagged PR #141 for human review (security)        │
+│                                                              │
+│ Judgment accuracy: 4/4 (100%)                                │
+│ Human overrides: 0                                           │
+│ Trust recommendation: MAINTAIN                               │
+╰─────────────────────────────────────────────────────────────╯
 ```
 
 ---

@@ -16,15 +16,17 @@ const activeTab = ref('developers')
 
 // Terminal demo animation
 const demoLines = [
-  { type: 'prompt', text: '$ openkoi "refactor auth module to use JWT"' },
+  { type: 'prompt', text: '$ openkoi think "refactor auth module to use JWT"' },
   { type: 'output', text: '' },
-  { type: 'status', label: 'PLAN', text: 'Analyzing src/auth/ — 4 files, 312 lines' },
+  { type: 'status', label: 'SOVEREIGN', text: 'Values: security-first, concise code, full test coverage' },
+  { type: 'status', label: 'PARLIAMENT', text: 'Guardian APPROVE · Scholar flags missing refresh logic' },
   { type: 'status', label: 'EXEC', text: 'Rewriting token.rs, middleware.rs, handlers.rs' },
-  { type: 'status', label: 'EVAL', text: 'Running rubric: correctness=9.2 safety=9.5 style=8.8' },
-  { type: 'status', label: 'REFN', text: 'Style score below 9.0 — tightening error types' },
+  { type: 'status', label: 'EVAL', text: 'correctness=9.2 safety=9.5 style=8.8' },
+  { type: 'status', label: 'REFN', text: 'Style below 9.0 — tightening error types' },
   { type: 'output', text: '' },
   { type: 'status', label: 'EVAL', text: 'Pass 2: correctness=9.4 safety=9.5 style=9.3' },
-  { type: 'done', text: '✓ Done in 3 iterations. 4 files changed, 47 insertions, 89 deletions.' },
+  { type: 'status', label: 'LEARNED', text: 'Pattern: "JWT auth setup" · Confidence: 0.5 → 0.65' },
+  { type: 'done', text: '✓ Done — 4 files changed, 47 insertions, 89 deletions.' },
 ]
 const visibleLines = ref(0)
 let demoInterval
@@ -65,8 +67,8 @@ onUnmounted(() => {
   clearInterval(loopInterval)
 })
 
-const loopStages = ['Plan', 'Execute', 'Evaluate', 'Refine']
-const currentStage = computed(() => loopStep.value % 4)
+const loopStages = ['Sovereign', 'Parliament', 'Execute', 'Evaluate', 'Learn']
+const currentStage = computed(() => loopStep.value % 5)
 </script>
 
 <template>
@@ -93,9 +95,9 @@ const currentStage = computed(() => loopStep.value % 4)
       <!-- Hero -->
       <section class="hero">
         <div class="hero-left">
-          <p class="hero-label">Self-iterating AI agent</p>
-          <h1>Stop babysitting<br/><span class="accent">your AI.</span><br/>OpenKoi iterates.</h1>
-          <p class="hero-sub">AI coding tools generate a first draft and leave you to fix it. OpenKoi reviews its own work — iterating until quality thresholds are met.<br/>Single Rust binary. Zero dependencies. Any model.</p>
+          <p class="hero-label">Executive Function as a Service</p>
+          <h1>Stop babysitting<br/><span class="accent">your AI.</span><br/>OpenKoi thinks.</h1>
+          <p class="hero-sub">AI coding tools generate a first draft and leave you to fix it. OpenKoi deliberates through a Sovereign-Parliament cognitive stack — iterating until quality thresholds are met.<br/>Single Rust binary. Zero dependencies. Any model.</p>
 
           <div class="hero-actions">
             <a href="/guide/installation" class="btn-primary">Install OpenKoi →</a>
@@ -168,8 +170,8 @@ const currentStage = computed(() => loopStep.value % 4)
 
       <!-- How It Works — iteration loop -->
       <section id="how-it-works" class="section-how">
-        <h2>OpenKoi reviews its own work</h2>
-        <p class="section-sub">Instead of generating and stopping, OpenKoi follows a rigorous iteration loop. It evaluates its own output against domain-specific rubrics — and refines until quality thresholds are met.</p>
+        <h2>OpenKoi thinks before it acts</h2>
+        <p class="section-sub">Instead of generating and stopping, OpenKoi runs a full cognitive pipeline. A Sovereign directive guides deliberation through a Parliament of agencies — then executes, evaluates, and learns from every outcome.</p>
 
         <div class="loop-track">
           <div
@@ -224,9 +226,9 @@ const currentStage = computed(() => loopStep.value % 4)
         <transition name="fade" mode="out-in">
           <div v-if="activeTab === 'developers'" class="cap-grid" key="dev">
             <div class="cap-item">
-              <code class="cap-icon">&gt;_</code>
-              <h3>Interactive REPL</h3>
-              <p>Full interactive mode with history, completions, and piped input support.</p>
+              <code class="cap-icon">think</code>
+              <h3>Cognitive CLI</h3>
+              <p>Six cognitive commands — think, soul, mind, world, reflect, trust — expose the full deliberation pipeline.</p>
             </div>
             <div class="cap-item">
               <code class="cap-icon">MCP</code>
@@ -242,9 +244,9 @@ const currentStage = computed(() => loopStep.value % 4)
 
           <div v-else-if="activeTab === 'researchers'" class="cap-grid" key="research">
             <div class="cap-item">
-              <code class="cap-icon">9.2</code>
-              <h3>Formal Evaluation</h3>
-              <p>Define rubrics in Markdown. Track scores across correctness, safety, and style dimensions.</p>
+              <code class="cap-icon">mind</code>
+              <h3>Society of Mind</h3>
+              <p>Five agencies deliberate on every decision. Inspect dissent, calibrate accuracy, view parliament records.</p>
             </div>
             <div class="cap-item">
               <code class="cap-icon">Δ</code>
@@ -260,9 +262,9 @@ const currentStage = computed(() => loopStep.value % 4)
 
           <div v-else class="cap-grid" key="everyone">
             <div class="cap-item">
-              <code class="cap-icon">10x</code>
-              <h3>10 Integrations</h3>
-              <p>Slack, Discord, Telegram, Teams, iMessage, Email, Notion, Google Docs, Sheets, MS Office.</p>
+              <code class="cap-icon">trust</code>
+              <h3>Earned Autonomy</h3>
+              <p>Delegation is granted domain by domain. Trust grows with accuracy. Audit every autonomous action.</p>
             </div>
             <div class="cap-item">
               <code class="cap-icon">0dep</code>
@@ -270,9 +272,9 @@ const currentStage = computed(() => loopStep.value % 4)
               <p>No Python, no Node, no containers. Single binary that finds your API keys automatically.</p>
             </div>
             <div class="cap-item">
-              <code class="cap-icon">++</code>
-              <h3>Self-Learning</h3>
-              <p>The more you use it, the better it gets. Patterns become reusable skills automatically.</p>
+              <code class="cap-icon">reflect</code>
+              <h3>Self-Reflection</h3>
+              <p>Daily, weekly, and growth reflection loops. The agent admits mistakes and calibrates confidence.</p>
             </div>
           </div>
         </transition>
@@ -281,12 +283,17 @@ const currentStage = computed(() => loopStep.value % 4)
       <!-- What Changes (Success / Transformation) -->
       <section class="section-transform">
         <h2>What changes</h2>
-        <p class="section-sub">From babysitting your AI agent to shipping code that's already been reviewed.</p>
+        <p class="section-sub">From babysitting your AI agent to shipping code that's already been deliberated.</p>
         <div class="transform-grid">
           <div class="transform-item">
             <div class="transform-before">You manually review every AI output</div>
             <div class="transform-arrow">→</div>
             <div class="transform-after">OpenKoi evaluates its own work against rubrics</div>
+          </div>
+          <div class="transform-item">
+            <div class="transform-before">No idea how the AI decided</div>
+            <div class="transform-arrow">→</div>
+            <div class="transform-after">Sovereign directive + Parliament deliberation visible on every task</div>
           </div>
           <div class="transform-item">
             <div class="transform-before">You re-prompt corrections 3–5 times</div>
@@ -367,16 +374,16 @@ const currentStage = computed(() => loopStep.value % 4)
             <div class="term-line visible prompt"><span class="term-text"><span class="comment"># 1. Install</span></span></div>
             <div class="term-line visible prompt"><span class="term-text">$ curl -fsSL https://openkoi.ai/install.sh | sh</span></div>
             <div class="term-line visible output"><span class="term-text">&nbsp;</span></div>
-            <div class="term-line visible prompt"><span class="term-text"><span class="comment"># 2. Run — API keys are detected automatically</span></span></div>
-            <div class="term-line visible prompt"><span class="term-text">$ openkoi "refactor auth module to use JWT"</span></div>
+            <div class="term-line visible prompt"><span class="term-text"><span class="comment"># 2. Think — API keys are detected automatically</span></span></div>
+            <div class="term-line visible prompt"><span class="term-text">$ openkoi think "refactor auth module to use JWT"</span></div>
             <div class="term-line visible output"><span class="term-text">&nbsp;</span></div>
-            <div class="term-line visible prompt"><span class="term-text"><span class="comment"># 3. Ship — it iterates until the code passes review</span></span></div>
+            <div class="term-line visible prompt"><span class="term-text"><span class="comment"># 3. Ship — it deliberates, executes, and learns</span></span></div>
             <div class="term-line visible prompt"><span class="term-text">$ openkoi status --live</span></div>
           </div>
         </div>
         <div class="qs-text">
           <h2>Three steps to ship</h2>
-          <p><strong>Install</strong> with one command. <strong>Run</strong> by describing what you want — OpenKoi discovers your API keys from environment variables, CLI tools, and keychains automatically. <strong>Ship</strong> code that's already been through the iteration loop.</p>
+          <p><strong>Install</strong> with one command. <strong>Think</strong> by describing what you want — OpenKoi discovers your API keys from environment variables, CLI tools, and keychains automatically. <strong>Ship</strong> code that's already been through the cognitive pipeline.</p>
           <a href="/guide/installation" class="btn-primary">Install OpenKoi →</a>
           <a href="/guide/cli-reference" class="btn-secondary">CLI Reference</a>
         </div>
@@ -391,7 +398,7 @@ const currentStage = computed(() => loopStep.value % 4)
             <img src="/logo.png" alt="OpenKoi" />
             <span class="brand">OpenKoi</span>
           </a>
-          <p>AI coding agent that reviews its own work. Built with Rust.</p>
+          <p>Executive Function as a Service. AI agent that thinks before it acts. Built with Rust.</p>
           <div class="footer-social">
             <a href="https://github.com/openkoi-ai/openkoi" target="_blank" aria-label="GitHub">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
@@ -412,6 +419,14 @@ const currentStage = computed(() => loopStep.value % 4)
             <a href="/guide/iteration-engine">Iteration Engine</a>
             <a href="/guide/evaluator-system">Evaluator System</a>
             <a href="/guide/providers">Providers</a>
+          </div>
+          <div class="nav-col">
+            <h4>Cognitive</h4>
+            <a href="/guide/think">Think</a>
+            <a href="/guide/mind">Mind</a>
+            <a href="/guide/world">World</a>
+            <a href="/guide/reflect">Reflect</a>
+            <a href="/guide/trust">Trust</a>
           </div>
           <div class="nav-col">
             <h4>Resources</h4>
@@ -732,10 +747,12 @@ const currentStage = computed(() => loopStep.value % 4)
   flex-shrink: 0;
 }
 
-.term-label.plan { background: rgba(234, 88, 12, 0.2); color: var(--koi-orange); }
+.term-label.sovereign { background: rgba(234, 88, 12, 0.2); color: var(--koi-orange); }
+.term-label.parliament { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
 .term-label.exec { background: rgba(34, 211, 238, 0.15); color: var(--koi-cyan); }
 .term-label.eval { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
 .term-label.refn { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+.term-label.learned { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
 
 .term-text {
   color: #a1a1aa;
@@ -931,7 +948,7 @@ const currentStage = computed(() => loopStep.value % 4)
   border-radius: 8px 0 0 8px;
 }
 
-.loop-stage:nth-child(4) {
+.loop-stage:nth-child(5) {
   border-radius: 0 8px 8px 0;
 }
 

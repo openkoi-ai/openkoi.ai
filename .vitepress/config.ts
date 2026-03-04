@@ -2,7 +2,7 @@ import { defineConfig } from 'vitepress'
 
 export default defineConfig({
     title: "OpenKoi",
-    description: "Stop babysitting your AI. OpenKoi iterates until the code is right.",
+    description: "Executive Function as a Service. OpenKoi thinks before it acts.",
     head: [
         ['link', { rel: 'icon', type: 'image/png', href: '/logo.png' }],
         ['meta', { name: 'theme-color', content: '#ea580c' }],
@@ -55,6 +55,16 @@ export default defineConfig({
                     { text: 'Pattern Mining', link: '/guide/pattern-mining' },
                     { text: 'Soul System', link: '/guide/soul-system' },
                     { text: 'Skill System', link: '/guide/skill-system' }
+                ]
+            },
+            {
+                text: 'Cognitive Commands',
+                items: [
+                    { text: 'Think (EFaaS Pipeline)', link: '/guide/think' },
+                    { text: 'Mind (Society of Mind)', link: '/guide/mind' },
+                    { text: 'World (World Model)', link: '/guide/world' },
+                    { text: 'Reflect (Feedback Loops)', link: '/guide/reflect' },
+                    { text: 'Trust (Delegation)', link: '/guide/trust' }
                 ]
             },
             {

@@ -1,6 +1,6 @@
-# OpenKoi — Self-Iterating AI Agent System
+# OpenKoi — Executive Function as a Service (EFaaS)
 
-OpenKoi is a standalone, CLI-first AI agent platform written in Rust. It iterates on its own output using a Plan-Execute-Evaluate-Refine cycle, evaluates results against rubrics, learns from daily usage patterns, and integrates with external apps. Ships as a single static binary with zero runtime dependencies.
+OpenKoi is a standalone, CLI-first AI agent platform written in Rust. It implements Executive Function as a Service: a cognitive architecture where a Sovereign identity directs a Parliament of agencies, which deliberate before every action. The agent thinks before it acts — simulating futures, evaluating through rubrics, and learning from every outcome. Ships as a single static binary with zero runtime dependencies.
 
 ## License
 MIT License
@@ -14,12 +14,26 @@ https://openkoi.ai
 ## Core Design Principles
 1. Single binary — `cargo install openkoi`. No Node, Python, or Docker. ~20MB static binary.
 2. Token-frugal — Context compression, evaluation caching, diff-patch instead of regeneration.
-3. Zero-config — `openkoi "task"` works immediately. Detects API keys from environment.
+3. Zero-config — `openkoi think "task"` works immediately. Detects API keys from environment.
 4. Local-first — All data on-device in SQLite. No cloud requirement.
 5. Model-agnostic — Anthropic, OpenAI, Google, Ollama, AWS Bedrock, any OpenAI-compatible endpoint.
 6. Learn from use — Observes patterns, proposes new skills to automate recurring workflows.
-7. Iterate to quality — Agent is its own reviewer. Stops when quality threshold is met.
-8. Extensible — WASM plugins, Rhai scripts, MCP for external tools.
+7. Think, don't run — The agent deliberates through a Sovereign-Parliament pipeline before acting.
+8. Earned autonomy — Trust is granted domain by domain, based on demonstrated accuracy.
+9. Extensible — WASM plugins, Rhai scripts, MCP for external tools.
+
+## Cognitive Architecture (EFaaS)
+OpenKoi implements a four-layer cognitive stack:
+
+1. **Sovereign** — The identity layer. Loads SOUL.md, value model, and trajectory. Sets the directive for every task.
+2. **Parliament** — Society of Mind. Five agencies (Guardian, Economist, Empath, Scholar, Strategist) deliberate on every action. Any agency can block, approve, or add caveats.
+3. **Orchestrator** — Executes the Parliament's decision through the iteration engine (execute, evaluate, refine).
+4. **World Model** — Three atlases (Tool, Domain, Human) track what the agent knows about tools, domains, and the human. Updated by every failure and success.
+
+Feedback flows back through three loops:
+- **Tight loop** (per-task): immediate learning from outcomes
+- **Medium loop** (weekly): behavioral trends and pattern detection
+- **Deep loop** (monthly): soul evolution proposals and maturity stage advancement
 
 ## Supported Providers
 - Anthropic (Claude Sonnet 4.5, Claude Haiku) — ANTHROPIC_API_KEY
@@ -37,17 +51,43 @@ https://openkoi.ai
 Different models can be assigned to each role. Smart default: same model for all roles.
 
 ## CLI Quick Reference
-- `openkoi "task"` — Run a task (default 3 iterations)
-- `openkoi chat` — Interactive REPL session
+
+### Core Commands
+- `openkoi think "task"` — Full EFaaS pipeline (Sovereign → Parliament → Execute → Learn)
+- `openkoi think "task" --simulate` — Simulate futures without executing
+- `openkoi think "task" --verbose` — Show full parliamentary deliberation
+- `openkoi chat` — Interactive REPL session with the cognitive stack
 - `openkoi learn` — Review proposed skills from pattern mining
 - `openkoi learn --approve <name>` — Approve a proposed skill
-- `openkoi status` — Show costs, memory, active models, integrations
-- `openkoi doctor` — Run diagnostics (providers, MCP, permissions, DB health)
-- `openkoi connect <app>` — Connect an integration (Slack, GitHub, Jira, etc.)
-- `openkoi export <type>` — Export data (learnings, sessions, patterns, all) as JSON or YAML
-- `openkoi migrate` — Show/run database migrations
+- `openkoi status` — Show costs, memory, active models, maturity stage
+- `openkoi setup` — First-time setup wizard
 - `openkoi update` — Self-update from GitHub releases
-- `openkoi update --check` — Check for new versions without updating
+
+### Cognitive Commands
+- `openkoi soul show` — Display SOUL.md, value model, and trajectory
+- `openkoi soul evolve` — Trigger soul evolution check with evidence
+- `openkoi soul diff` — Show proposed soul changes
+- `openkoi soul history` — Show evolution timeline
+- `openkoi mind parliament` — Show last deliberation record
+- `openkoi mind agencies` — List active agencies and recent verdicts
+- `openkoi mind dissent` — Show cases where agencies disagreed
+- `openkoi mind calibrate` — Review agency accuracy vs. outcomes
+- `openkoi world tools` — Tool Atlas: known tools, reliability, failure modes
+- `openkoi world domains` — Domain Atlas: learned domain knowledge
+- `openkoi world human` — Human Atlas: what the agent knows about you
+- `openkoi world map` — Full World Map overview
+- `openkoi reflect today` — Today's decisions, outcomes, self-assessment
+- `openkoi reflect week` — Weekly patterns and behavioral trends
+- `openkoi reflect growth` — Maturity stage progress and unlock conditions
+- `openkoi reflect honest` — Epistemic audit: where was I wrong?
+- `openkoi trust show` — Current trust level per domain
+- `openkoi trust grant <domain>` — Delegate a domain to autonomous action
+- `openkoi trust revoke <domain>` — Revoke delegation
+- `openkoi trust audit` — Review autonomous actions taken
+
+### Daemon & Diagnostics
+- `openkoi daemon start|stop|status` — Background daemon management
+- `openkoi doctor` — Run diagnostics (alias: `openkoi status --verbose`)
 
 ## REPL Slash Commands (in chat mode)
 - /status — Show iteration stats
@@ -87,6 +127,45 @@ Different models can be assigned to each role. Smart default: same model for all
 - Memory compaction and decay over time
 - Session transcripts preserved for learning
 
+## Soul System
+- Sovereign identity layer with SOUL.md, value model, and trajectory
+- Five personality dimensions: risk tolerance, cost sensitivity, brevity preference, decision speed, trust levels
+- Evolves based on feedback and interaction patterns — proposes changes with evidence and confidence
+- Four maturity stages: Competent Executor → Proactive Advisor → Trusted Delegate → Sovereign Partner
+- Persisted locally in soul.toml
+- Inspect with `openkoi soul show`, evolve with `openkoi soul evolve`
+
+## Parliament (Society of Mind)
+- Five agencies deliberate on every task:
+  - Guardian: safety, reversibility, blast radius
+  - Economist: cost, token budget, efficiency
+  - Empath: user emotion, tone, relationship
+  - Scholar: accuracy, evidence, verification
+  - Strategist: long-term impact, alignment with trajectory
+- Any agency can BLOCK (hard stop), APPROVE, or APPROVE+ (with caveats)
+- Inspect with `openkoi mind parliament`, calibrate with `openkoi mind calibrate`
+
+## World Model
+- Three atlases track the agent's understanding of reality:
+  - Tool Atlas: tool reliability, failure modes, workarounds, class generalizations
+  - Domain Atlas: learned domain knowledge, confidence per topic
+  - Human Atlas: user preferences, work patterns, communication style
+- Updated by every task outcome
+- Inspect with `openkoi world tools`, `openkoi world domains`, `openkoi world human`
+
+## Trust & Delegation
+- Four trust levels: NONE → LOW (always ask) → MEDIUM (suggest + approve) → HIGH (delegated)
+- Trust is earned domain by domain based on judgment accuracy
+- Audit autonomous actions with `openkoi trust audit`
+- Grant/revoke with `openkoi trust grant <domain>` / `openkoi trust revoke <domain>`
+
+## Reflection Loops
+- Three feedback cycles at different time horizons:
+  - `openkoi reflect today` — decisions made, outcomes, self-assessment
+  - `openkoi reflect week` — behavioral trends, pattern detection
+  - `openkoi reflect growth` — maturity stage progress, unlock conditions
+- Epistemic honesty audit: `openkoi reflect honest` shows where the agent was wrong and what it learned
+
 ## Integrations (10 Built-in)
 - Slack — Messaging and channel search
 - Discord — Messaging and channel history
@@ -107,17 +186,12 @@ Each integration exposes dual adapters (messaging + document) as MCP-compatible 
 - Evaluation caching to avoid redundant checks
 - Confidence-based early stopping
 
-## Soul System (Optional)
-- Personality traits: formality, verbosity, emoji usage, technical depth
-- Evolves based on feedback and interaction patterns
-- Persisted locally in soul.toml
-- Fully optional — works without it
-
 ## Security
 - File permission auditing (chmod 600/700 for credentials)
 - WASM sandbox with capability manifests
 - MCP process isolation
-- Trust levels for different operation types
+- Trust levels for different operation types — inspect with `openkoi trust show`
+- Guardian agency blocks irreversible actions automatically
 - No data leaves the machine (except model API calls)
 
 ## Architecture
@@ -126,7 +200,7 @@ Each integration exposes dual adapters (messaging + document) as MCP-compatible 
 - reqwest for HTTP, reqwest-eventsource for SSE streaming
 - clap for CLI parsing
 - serde for serialization
-- Modular: provider/, memory/, integrations/, plugins/, security/, cli/
+- Modular: provider/, memory/, integrations/, plugins/, security/, cli/, soul/, mind/, world/, reflect/, trust/
 
 ## Installation
 - cargo install openkoi

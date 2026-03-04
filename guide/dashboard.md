@@ -1,6 +1,6 @@
 # Dashboard & Daemon
 
-OpenKoi provides a rich set of observability tools: a TUI built with ratatui, a diagnostic doctor command, a background daemon for automated tasks, and an interactive REPL for conversational usage. This page covers all of them.
+OpenKoi provides a rich set of observability tools: a TUI built with ratatui, a diagnostic doctor command, a background daemon for automated tasks, and an interactive REPL for conversational usage. The cognitive commands (`reflect`, `trust`, `mind`, `world`) complement these tools by providing deep inspection of the agent's decision-making process. This page covers the operational side.
 
 ## Status Command
 
@@ -15,9 +15,10 @@ $ openkoi status
   Skills:       34 active, 2 proposed
   Integrations: slack (ok), notion (ok)
   Cost today:   $0.42 (3 tasks)
+  Maturity:     Stage 2 / 4 (Proactive Advisor)
 ```
 
-This is the default view. It answers the most common question: "what state is my agent in right now?"
+This is the default view. It answers the most common question: "what state is my agent in right now?" For deeper inspection of decisions and judgment, see [`openkoi reflect today`](/guide/reflect) and [`openkoi trust show`](/guide/trust).
 
 ### Verbose Status
 
@@ -36,8 +37,9 @@ $ openkoi status --live
 
   Task:       Fix the login bug
   ID:         a1b2c3d4
-  Phase:      executing
+  Phase:      executing (Sovereign → Parliament → Exec)
   Progress:   [████████░░░░░░░░░░░░░░░░░░░░░░] (2/5)
+  Parliament: Guardian APPROVE · Scholar APPROVE+
   Score:      0.78 (best: 0.82)
   Cost:       $0.1234
   Tokens:     24,500
@@ -97,8 +99,12 @@ $ openkoi status --verbose
   Database:       ~/.local/share/openkoi/openkoi.db (12MB)
   Config:         ~/.openkoi/config.toml (loaded)
   Soul:           serial-entrepreneur (user, modified)
+  Maturity:       Stage 2 / 4 (Proactive Advisor, 60%)
+  Trust:          3 delegated, 2 suggest+approve, 2 always-ask
   Disk total:     59MB
 ```
+
+For detailed inspection of the soul, mind, world model, and trust levels, use the [cognitive commands](/guide/think).
 
 ### Cost Dashboard
 
@@ -155,6 +161,10 @@ All cost data is persisted to SQLite in the `sessions` and `tasks` tables, enabl
 ## Doctor Command
 
 The `openkoi doctor` command runs a comprehensive health check across every subsystem. It reports issues and suggests fixes.
+
+::: tip Alias
+`openkoi doctor` is an alias for `openkoi status --verbose`. Both produce the same output.
+:::
 
 ### What It Checks
 
@@ -521,12 +531,24 @@ Delivery is fire-and-forget with a 10-second timeout. Failed deliveries are logg
 
 | Tool | Command | Purpose |
 |------|---------|---------|
-| **Status** | `openkoi status` | Quick overview of memory, skills, cost. |
-| **Verbose status** | `openkoi status --verbose` | Detailed breakdown of every subsystem. |
+| **Status** | `openkoi status` | Quick overview of memory, skills, cost, maturity stage. |
+| **Verbose status** | `openkoi status --verbose` | Detailed breakdown of every subsystem including trust levels. |
 | **Cost dashboard** | `openkoi status --costs` | Cost breakdown by time period and model. |
-| **Live monitoring** | `openkoi status --live` | Real-time view of the running task with progress bar. |
-| **Doctor** | `openkoi doctor` | Health check with fix suggestions. |
+| **Live monitoring** | `openkoi status --live` | Real-time view of the running task with Parliament verdicts. |
+| **Doctor** | `openkoi doctor` | Health check with fix suggestions (alias for `status --verbose`). |
 | **Daemon** | `openkoi daemon start` | Background execution of scheduled skills and watchers. |
 | **HTTP API** | `localhost:9742` | REST API for external tools and scripts. |
 | **REPL** | `openkoi chat` | Interactive session with slash commands. |
 | **Transcripts** | `~/.local/share/openkoi/sessions/` | JSONL audit trail of every session. |
+
+### Related: Cognitive Commands
+
+For deeper inspection of the agent's decision-making, see:
+
+| Command | Purpose |
+|---------|---------|
+| [`openkoi reflect today`](/guide/reflect) | Today's decisions, outcomes, and self-assessment. |
+| [`openkoi trust audit`](/guide/trust) | Review autonomous actions taken under delegation. |
+| [`openkoi mind parliament`](/guide/mind) | Inspect the last deliberation record. |
+| [`openkoi world tools`](/guide/world) | Tool reliability, failure modes, and workarounds. |
+| [`openkoi soul show`](/guide/soul-system) | Current soul identity, value model, and trajectory. |

@@ -2,30 +2,33 @@
 
 AI coding tools today generate a first draft and stop. You review it, fix it, re-prompt corrections, and iterate — becoming the AI's QA department on top of being the developer. OpenKoi is different.
 
-OpenKoi follows a rigorous **Plan-Execute-Evaluate-Refine** cycle. It reviews its own output using domain-specific rubrics, identifies what needs improvement, and iterates — until results meet your quality standards. You describe the task. OpenKoi does the iteration.
+OpenKoi is **Executive Function as a Service** (EFaaS). It doesn't just execute — it **deliberates** before acting. A Sovereign Directive frames the task, a Parliament of five agencies evaluates risk, cost, and strategy, and the agent iterates until results meet your quality standards. You see the thinking, not just the output.
 
 ```bash
 cargo install openkoi
-openkoi "Refactor the auth module to use JWT tokens"
+openkoi think "Refactor the auth module to use JWT tokens"
 ```
 
-That's it. OpenKoi detects your API keys from the environment, picks the best available model, infers the task type, and starts iterating. No config file needed. No setup wizard. Max two interactions before your first result.
+That's it. OpenKoi detects your API keys from the environment, picks the best available model, runs the task through its cognitive pipeline, and iterates. No config file needed. No setup wizard.
 
 ## Three Steps
 
 | Step | What happens |
 |------|--------------|
 | **1. Install** | One command. Single static binary, ~20MB. No Python, no Node, no Docker. |
-| **2. Run** | Describe what you want. OpenKoi finds your API keys from env vars, existing CLI tools, and local model servers automatically. |
+| **2. Think** | Describe what you want. OpenKoi deliberates: Sovereign Directive frames the task, Parliament evaluates risk, then execution begins. |
 | **3. Ship** | OpenKoi iterates — plan, execute, evaluate, refine — until the code passes its own quality review. |
 
 ## What Changes
 
 | Before | After |
 |--------|-------|
+| `agent run "do X"` → output | `openkoi think "do X"` → deliberation → parliament → output |
+| You see the result | You see **how it decided**, not just what it decided |
 | You manually review every AI output | OpenKoi evaluates its own work against rubrics |
-| You re-prompt corrections 3–5 times | Automatic iteration, stops when quality threshold is met |
+| You re-prompt corrections 3-5 times | Automatic iteration, stops when quality threshold is met |
 | Learnings vanish between sessions | Patterns persist in local SQLite; skills improve over time |
+| Memory is hidden | World model is inspectable: `openkoi world`, `openkoi mind` |
 | Locked to one model provider | Switch with a flag; assign different models per role |
 | Your data lives in someone else's cloud | Everything stays on your machine; export anytime |
 
@@ -58,11 +61,20 @@ These numbers matter when the agent runs as a background daemon, processes long-
 
 ## Architecture Overview
 
-OpenKoi's architecture centers on an **Orchestrator** that coordinates all subsystems:
+OpenKoi's architecture centers on a **cognitive pipeline** — from Sovereign identity through Parliamentary deliberation to execution:
 
 ```
                     ┌─────────────────┐
-                    │   Orchestrator  │
+                    │   Sovereign     │  ← Soul (SOUL.md + Value Model + Trajectory)
+                    │   Directive     │
+                    └────────┬────────┘
+                             │
+                    ┌────────▼────────┐
+                    │   Parliament    │  ← Mind (Guardian, Economist, Empath, Scholar, Strategist)
+                    └────────┬────────┘
+                             │
+                    ┌────────▼────────┐
+                    │  Orchestrator   │
                     └────────┬────────┘
          ┌──────────┬───────┼───────┬──────────┐
          ▼          ▼       ▼       ▼          ▼
@@ -73,10 +85,22 @@ OpenKoi's architecture centers on an **Orchestrator** that coordinates all subsy
          │                                     └──────────┘
     ┌────▼────┐
     │  Tools  │ ← MCP subprocesses, WASM, Rhai
+    └────┬────┘
+         │
+    ┌────▼────┐
+    │  World  │ ← World Model (Tool Atlas + Domain Atlas + Human Atlas)
+    │  Model  │
     └─────────┘
 ```
 
-**Executor** carries out tasks by calling model providers and invoking tools. **Evaluator** judges the output against rubrics and decides whether another iteration is needed. **Learner** persists successful patterns into memory. **Pattern Miner** analyzes usage over time and proposes new skills. **App Integrations** connect to Slack, GitHub, Jira, and 7 other services.
+**Sovereign Directive** frames every task with the soul's identity, values, and constraints. **Parliament** — five agencies (Guardian, Economist, Empath, Scholar, Strategist) — deliberates on risk, cost, and strategy before execution begins. **Orchestrator** runs the Plan-Execute-Evaluate-Refine loop. **World Model** tracks tool reliability, domain knowledge, and human preferences, updated by every interaction.
+
+Inspect any layer from the CLI:
+- `openkoi soul show` — see the Sovereign identity
+- `openkoi mind parliament` — see the last deliberation
+- `openkoi world tools` — see tool reliability and failure modes
+- `openkoi reflect today` — see today's decisions and self-assessment
+- `openkoi trust show` — see delegation levels per domain
 
 Underneath, OpenKoi uses:
 - **SQLite** for persistent memory, sessions, and learnings
@@ -99,14 +123,15 @@ Default iteration limit is 3, configurable per task or globally.
 
 ## The Soul System
 
-OpenKoi includes an optional **Soul System** that tracks personality traits, preferences, and interaction styles. Over time, the agent adapts to your communication patterns:
+OpenKoi includes a **Soul System** that tracks personality traits, preferences, and interaction styles. The soul is the Sovereign layer — it frames every task with identity, values, and constraints.
 
 - **Personality axes** — Formality, verbosity, emoji usage, technical depth
 - **Evolution** — The soul evolves based on your feedback and interaction patterns
 - **Customization** — Override any axis in `config.toml` or per-session
 - **Persistence** — Soul state is stored locally and never leaves your machine
+- **CLI access** — Inspect with `openkoi soul show`, evolve with `openkoi soul evolve`
 
-The soul is entirely optional — OpenKoi works fine without it. But for users who want a more personalized experience, it provides a consistent agent personality that improves over time.
+The soul is entirely optional — OpenKoi works fine without it. But for users who want a more personalized experience, it provides a consistent agent personality that improves over time. See the full [Soul System](/guide/soul-system) documentation.
 
 ## What OpenKoi Is Not
 
@@ -119,5 +144,7 @@ The soul is entirely optional — OpenKoi works fine without it. But for users w
 
 - [Installation & Setup](/guide/installation) — Get running in 60 seconds
 - [CLI Reference](/guide/cli-reference) — All commands and flags
+- [Think (EFaaS Pipeline)](/guide/think) — The flagship cognitive command
+- [Soul System](/guide/soul-system) — The Sovereign identity layer
 - [Configuration](/guide/configuration) — Customize behavior via `config.toml`
 - [Architecture Deep Dive](/guide/architecture) — Full module layout and data flow

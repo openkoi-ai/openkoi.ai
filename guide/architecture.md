@@ -1,6 +1,6 @@
 # Architecture
 
-OpenKoi is a single-binary Rust application organized as a library crate with a thin CLI entry point. This page covers the module layout, data flow, dependency choices, error handling, logging, testing, distribution, and performance characteristics.
+OpenKoi is a single-binary Rust application organized as a library crate with a thin CLI entry point. It implements Executive Function as a Service (EFaaS) — a cognitive architecture where a Sovereign identity directs a Parliament of agencies before every action. This page covers the module layout, data flow, dependency choices, error handling, logging, testing, distribution, and performance characteristics.
 
 ## Module Layout
 
@@ -21,6 +21,11 @@ openkoi/
       status.rs                       # System status + cost dashboard
       init.rs                         # First-time setup wizard
       connect.rs                      # Integration setup
+      think.rs                        # EFaaS pipeline: Sovereign → Parliament → Execute → Learn
+      mind.rs                         # Society of Mind: parliament, agencies, dissent, calibrate
+      world.rs                        # World Model: tools, domains, human, map
+      reflect.rs                      # Reflection loops: today, week, growth, honest
+      trust.rs                        # Trust management: show, grant, revoke, audit
 
     core/                             # Iteration engine (the brain)
       mod.rs
@@ -120,6 +125,37 @@ openkoi/
       loader.rs                      # Load from workspace > user > default
       evolution.rs                   # Soul evolution proposals
 
+    mind/                             # Society of Mind (Parliament of agencies)
+      mod.rs                         # Parliament coordinator
+      agencies.rs                    # Agency trait + five built-in agencies
+      guardian.rs                    # Guardian: safety, reversibility, blast radius
+      economist.rs                   # Economist: cost, token budget, efficiency
+      empath.rs                      # Empath: user emotion, tone, relationship
+      scholar.rs                     # Scholar: accuracy, evidence, verification
+      strategist.rs                  # Strategist: long-term impact, trajectory alignment
+      deliberation.rs                # Deliberation record + verdict types
+      calibration.rs                 # Agency accuracy tracking vs. outcomes
+
+    world/                            # World Model (three atlases)
+      mod.rs                         # World map coordinator
+      tool_atlas.rs                  # Tool reliability, failure modes, workarounds
+      domain_atlas.rs                # Learned domain knowledge, confidence
+      human_atlas.rs                 # User preferences, work patterns, communication style
+      generalization.rs              # Class-level generalizations across tools/domains
+
+    reflect/                          # Reflection & feedback loops
+      mod.rs                         # Reflection coordinator
+      tight.rs                       # Tight loop: per-task outcome analysis
+      medium.rs                      # Medium loop: weekly behavioral trends
+      deep.rs                        # Deep loop: soul evolution, maturity stage
+      honesty.rs                     # Epistemic audit: confidence calibration
+
+    trust/                            # Trust & delegation management
+      mod.rs                         # Trust level registry
+      levels.rs                      # Trust level types (NONE, LOW, MEDIUM, HIGH)
+      delegation.rs                  # Domain delegation logic
+      audit.rs                       # Autonomous action audit trail
+
     templates/                        # Embedded templates
       SOUL.md                        # Default soul (serial entrepreneur)
 
@@ -147,7 +183,20 @@ The following diagram shows how data moves through the system during a typical t
 
 ```
                               CLI (clap)
-                    openkoi <task> | chat | learn
+                    openkoi think | chat | learn
+                                |
+                    +-----------v-----------+
+                    |      Sovereign        |
+                    | (Soul + Value Model)  |
+                    +-----------+-----------+
+                                |
+                    +-----------v-----------+
+                    |      Parliament       |
+                    | (Society of Mind)     |
+                    | Guardian · Economist  |
+                    | Empath · Scholar      |
+                    | Strategist            |
+                    +-----------+-----------+
                                 |
                     +-----------v-----------+
                     |      Orchestrator     |
@@ -169,18 +218,35 @@ The following diagram shows how data moves through the system during a typical t
         | Anthropic | OpenAI | Google |  | DB | |Slack/TG |
         | Ollama | Bedrock | Compat.  |  +----+ |Notion   |
         +-----------------------------+         +---------+
+                        |
+              +---------v----------+
+              |    World Model     |
+              | Tool · Domain ·    |
+              | Human Atlases      |
+              +--------------------+
+                        |
+              +---------v----------+
+              |   Reflection &     |
+              |   Trust Feedback   |
+              | Today · Week ·     |
+              | Growth · Honest    |
+              +--------------------+
 ```
 
 ### Execution Sequence
 
-1. **CLI** parses the command and passes the task to the Orchestrator.
-2. **Orchestrator** performs recall (token-budgeted) via the Historian.
-3. **Learner** selects and ranks skills relevant to the task.
-4. **Executor** builds context (compressed, with delta feedback on iteration 2+) and sends to the Model Provider.
-5. **Evaluator** judges the output using evaluator skills (LLM-based rubrics) and built-in checks (tests, lint).
-6. **Orchestrator** decides: continue iterating, accept, or abort.
-7. **Learner** extracts learnings from the completed cycles (background, non-blocking).
-8. **Historian** persists the session, cycles, and learnings to SQLite.
+1. **CLI** parses the command and passes the task to the cognitive stack.
+2. **Sovereign** loads the soul (SOUL.md + value model + trajectory) and formulates a directive.
+3. **Parliament** deliberates: five agencies (Guardian, Economist, Empath, Scholar, Strategist) vote on the action. Any agency can BLOCK, APPROVE, or APPROVE with caveats.
+4. **Orchestrator** receives the Parliament verdict and performs recall (token-budgeted) via the Historian.
+5. **Learner** selects and ranks skills relevant to the task.
+6. **Executor** builds context (compressed, with delta feedback on iteration 2+) and sends to the Model Provider.
+7. **Evaluator** judges the output using evaluator skills (LLM-based rubrics) and built-in checks (tests, lint).
+8. **Orchestrator** decides: continue iterating, accept, or abort.
+9. **World Model** updates the relevant atlases (Tool, Domain, Human) based on the outcome.
+10. **Learner** extracts learnings from the completed cycles (background, non-blocking).
+11. **Reflection** feeds outcomes back into confidence calibration and the trust system.
+12. **Historian** persists the session, cycles, and learnings to SQLite.
 
 ## Dependency Summary
 
@@ -579,6 +645,11 @@ No manual intervention is required for database upgrades. Config files are forwa
 
 | Decision | Rationale |
 |----------|-----------|
+| **Think, don't run** | `openkoi think` exposes the full deliberation pipeline. Users see *how* the agent decided, not just *what* it decided. |
+| **Sovereign-Parliament stack** | Separating identity (Sovereign) from deliberation (Parliament) from execution (Orchestrator) enables inspectable, auditable decisions. |
+| **Five agencies** | Guardian (safety), Economist (cost), Empath (empathy), Scholar (accuracy), Strategist (long-term) cover the key judgment dimensions. Any can block. |
+| **Three atlases** | Tool Atlas, Domain Atlas, and Human Atlas give the agent an inspectable, editable world model. Nothing is hidden. |
+| **Earned autonomy** | Trust levels (NONE → LOW → MEDIUM → HIGH) are granted per domain based on demonstrated accuracy. The agent earns delegation through results. |
 | **Single binary** | Zero runtime dependencies. Download and run. No version conflicts. |
 | **SQLite for everything** | One database file for structured data, vectors, and FTS. No external database server. |
 | **TOML over YAML** | Rust-idiomatic. No ambiguous typing. Better for configuration files. |

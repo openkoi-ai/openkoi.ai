@@ -6,7 +6,7 @@ This page covers every layer of the security model: trust levels, credential sto
 
 ## Trust Levels
 
-OpenKoi uses a nested trust model. Each layer has strictly less access than the one above it.
+OpenKoi uses a nested trust model. Each layer has strictly less access than the one above it. Trust is also managed per-domain — you can grant the agent autonomous action in specific domains (like code review) while keeping other domains (like deployment) on a tight leash. Use `openkoi trust show` to see current levels and `openkoi trust audit` to review autonomous actions.
 
 ```
 +---------------------------------------------------------------+

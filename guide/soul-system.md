@@ -402,17 +402,40 @@ The project soul takes priority over your user soul, so this agent will behave d
 
 ### Checking Active Soul
 
-Use `openkoi status` to see which soul is active:
+Use `openkoi soul show` to see the full identity — explicit values from SOUL.md, learned preferences from interactions, and the trajectory model:
 
 ```
-$ openkoi status
-  Soul: serial-entrepreneur (default, unmodified)
-  Source: built-in template
+$ openkoi soul show
 
-$ openkoi status   # In a fintech project with .openkoi/SOUL.md
-  Soul: custom (workspace)
-  Source: .openkoi/SOUL.md (847 chars)
+╭─────────────────────────────────────────────────────────────╮
+│ SOUL — OpenKoi identity for Yong                             │
+│                                                              │
+│ ┌─ EXPLICIT (from SOUL.md) ──────────────────────────────┐  │
+│ │  Personality: Direct, technical, no fluff               │  │
+│ │  Tone:        Professional but warm                     │  │
+│ │  Source:      built-in template (serial entrepreneur)    │  │
+│ └─────────────────────────────────────────────────────────┘  │
+│                                                              │
+│ ┌─ LEARNED (from interactions) ──────────────────────────┐  │
+│ │  Risk tolerance:     0.35 / 1.0  (conservative)        │  │
+│ │  Cost sensitivity:   0.7  / 1.0  (budget-conscious)    │  │
+│ │  Brevity preference: 0.82 / 1.0  (strongly prefers)    │  │
+│ └─────────────────────────────────────────────────────────┘  │
+│                                                              │
+│ Maturity Stage: 2 / 4 (Proactive Advisor)                   │
+│ Soul age: 47 days  │  Interactions: 312                     │
+╰─────────────────────────────────────────────────────────────╯
 ```
+
+Other soul commands:
+
+```bash
+openkoi soul evolve     # Trigger evolution check from accumulated learnings
+openkoi soul diff       # Show proposed changes with evidence
+openkoi soul history    # Show evolution timeline
+```
+
+See the full [CLI Reference](/guide/cli-reference#openkoi-soul-action) for details.
 
 ### Validation
 
