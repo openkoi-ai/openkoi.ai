@@ -30,7 +30,7 @@ $ openkoi status --verbose
 
 ### Live Task Monitoring
 
-The `--live` flag watches the currently running task in real-time, polling `~/.openkoi/state/current-task.json` every second:
+The `--live` flag watches the currently running task in real-time, polling `~/.openkoi/state/last-task.json` every second:
 
 ```bash
 $ openkoi status --live
@@ -59,10 +59,10 @@ OpenKoi persists task state to the filesystem for external tools and the `--live
 
 | File | Purpose | Format |
 |------|---------|--------|
-| `~/.openkoi/state/current-task.json` | Currently running task | JSON (atomic writes) |
+| `~/.openkoi/state/last-task.json` | Last/currently running task | JSON (atomic writes) |
 | `~/.openkoi/state/task-history.jsonl` | Completed tasks log | JSON Lines (auto-rotates at 1000 lines or 1MB) |
 
-The `current-task.json` file is updated at each lifecycle transition (plan, iteration start, iteration end, completion) using atomic write-to-temp-then-rename. External scripts can poll this file safely without risk of partial reads.
+The `last-task.json` file is updated at each lifecycle transition (plan, iteration start, iteration end, completion) using atomic write-to-temp-then-rename. On task completion, the file is renamed from `current-task.json` to `last-task.json` rather than deleted, so the most recent task state is always available for inspection. External scripts can poll this file safely without risk of partial reads.
 
 ```bash
 $ openkoi status --verbose
@@ -279,7 +279,28 @@ Detected patterns with confidence >= 0.7 and sample count >= 3 are written to th
 
 ## Interactive REPL
 
-The `openkoi chat` command starts an interactive session with full agent capabilities.
+The `openkoi chat` command starts an interactive session with full agent capabilities. Every chat session is tracked — transcripts are saved automatically and sessions can be resumed later.
+
+### Session Lifecycle
+
+When you start a chat, OpenKoi creates a session record in the database and begins writing a transcript to `~/.local/share/openkoi/sessions/<session-id>/transcript.jsonl`. Task outputs within the session are saved as `<task-id>.md` files in the same directory. When the session ends, it is marked as "ended" with a timestamp.
+
+To resume a previous session:
+
+```bash
+openkoi chat --resume abc123    # by session ID prefix
+openkoi session resume abc123   # equivalent
+```
+
+On resume, older messages are compressed into a summary and the last 10 raw messages are loaded, giving the LLM continuity without blowing up the context window.
+
+### Session Management
+
+```bash
+openkoi session list            # List recent sessions
+openkoi session show abc1       # Show session details and tasks
+openkoi session delete abc1     # Delete a session and its data
+```
 
 ### Startup Banner
 
@@ -381,18 +402,23 @@ Tip: set OPENKOI_MODEL=ollama/codestral to change default model.
 
 ## Session Transcripts
 
-Every session is recorded as a JSONL (JSON Lines) transcript file for debugging, auditing, and analysis.
+Every session is recorded as a JSONL (JSON Lines) transcript file for debugging, auditing, and analysis. Task outputs are saved alongside the transcript as individual markdown files.
 
 ### Storage Location
 
 ```
 ~/.local/share/openkoi/sessions/
-  <session-id>.jsonl
-  <session-id>.jsonl
+  <session-id>/
+    transcript.jsonl             # Conversation transcript (append-only)
+    <task-id>.md                 # Saved output from each task
+    <task-id>.md
+  <session-id>/
+    transcript.jsonl
+    <task-id>.md
   ...
 ```
 
-Each session gets a unique UUID-based filename. Transcripts are append-only -- events are written as they occur, so even if the agent crashes, the transcript up to that point is preserved.
+Each session gets a directory named by its UUID. The transcript is append-only — events are written as they occur, so even if the agent crashes, the transcript up to that point is preserved. Task outputs are written on task completion and their paths are recorded in the `tasks.output_path` column in the database.
 
 ### Event Types
 
@@ -424,18 +450,23 @@ Transcripts are standard JSONL, readable by any tool that handles line-delimited
 
 ```bash
 # Count tasks completed today
-cat ~/.local/share/openkoi/sessions/*.jsonl | \
+cat ~/.local/share/openkoi/sessions/*/transcript.jsonl | \
   grep '"type":"task_complete"' | wc -l
 
 # Find expensive tasks
-cat ~/.local/share/openkoi/sessions/*.jsonl | \
+cat ~/.local/share/openkoi/sessions/*/transcript.jsonl | \
   grep '"type":"task_complete"' | \
   jq 'select(.cost_usd > 1.0)'
 
 # Replay a session's iteration scores
-cat ~/.local/share/openkoi/sessions/<id>.jsonl | \
+cat ~/.local/share/openkoi/sessions/<id>/transcript.jsonl | \
   grep '"type":"iteration"' | \
   jq '{n: .n, score: .score, tokens: .tokens}'
+
+# View a specific task's output
+openkoi task replay <task-id>
+# or directly:
+cat ~/.local/share/openkoi/sessions/<session-id>/<task-id>.md
 ```
 
 Transcripts are also indexed into the memory system. The Historian chunks transcript content and creates embeddings, making past sessions searchable via semantic recall.
@@ -536,10 +567,12 @@ Delivery is fire-and-forget with a 10-second timeout. Failed deliveries are logg
 | **Cost dashboard** | `openkoi status --costs` | Cost breakdown by time period and model. |
 | **Live monitoring** | `openkoi status --live` | Real-time view of the running task with Parliament verdicts. |
 | **Doctor** | `openkoi doctor` | Health check with fix suggestions (alias for `status --verbose`). |
+| **Sessions** | `openkoi session list\|show\|delete` | Browse and manage tracked sessions. |
+| **Tasks** | `openkoi task list\|show\|replay` | Browse task history and replay outputs. |
 | **Daemon** | `openkoi daemon start` | Background execution of scheduled skills and watchers. |
 | **HTTP API** | `localhost:9742` | REST API for external tools and scripts. |
-| **REPL** | `openkoi chat` | Interactive session with slash commands. |
-| **Transcripts** | `~/.local/share/openkoi/sessions/` | JSONL audit trail of every session. |
+| **REPL** | `openkoi chat` | Interactive session with slash commands. Resume with `--resume <id>`. |
+| **Transcripts** | `~/.local/share/openkoi/sessions/` | Per-session directories with JSONL transcripts and task output files. |
 
 ### Related: Cognitive Commands
 

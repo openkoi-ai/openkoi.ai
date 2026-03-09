@@ -20,6 +20,8 @@ OpenKoi ships as a single binary with a small, focused command surface. Commands
 | `openkoi disconnect [provider]` | Remove stored credentials for a provider |
 | `openkoi daemon [action]` | Manage the background daemon |
 | `openkoi dashboard` | TUI dashboard for tasks, costs, learnings, plugins |
+| `openkoi session [action]` | Manage sessions: list, show, resume, delete |
+| `openkoi task [action]` | Inspect task history and outputs: list, show, replay |
 | `openkoi update` | Update to the latest version |
 
 ---
@@ -507,21 +509,25 @@ $ openkoi trust audit code-review
 
 ## `openkoi chat`
 
-Starts an interactive REPL session. You type tasks, see iteration progress in real time, and use slash commands to adjust behavior mid-session.
+Starts an interactive REPL session. You type tasks, see iteration progress in real time, and use slash commands to adjust behavior mid-session. Chat sessions are persisted — transcripts are saved automatically and can be resumed later.
 
 ```bash
 # Start a new session
 openkoi chat
 
-# Resume a previous session by ID
-openkoi chat --session abc123
+# Resume a previous session by ID (prefix match supported)
+openkoi chat --resume abc123
 ```
 
 ### Flags
 
 | Flag | Description |
 |------|-------------|
-| `--session <id>` | Resume a previously saved session. The session transcript is loaded from `~/.local/share/openkoi/sessions/<id>.jsonl`. |
+| `--resume <id>` | Resume a previously saved session. The session is resolved by ID prefix match. On resume, older messages are compressed into a summary and the last 10 messages are loaded verbatim, giving the LLM continuity without blowing up the context window. |
+
+### Session Persistence
+
+Every chat session creates a tracked session record in the database. The conversation transcript is saved to `~/.local/share/openkoi/sessions/<session-id>/transcript.jsonl` and task outputs are saved as `<task-id>.md` files in the same directory. When you resume a session, OpenKoi builds a compact summary of older exchanges plus the most recent messages, providing seamless continuity.
 
 ### Session Startup Banner
 
@@ -645,7 +651,7 @@ openkoi status --live
 |------|-------------|
 | `--verbose` | Show detailed breakdown of all subsystems: memory layers, individual skill scores, provider health, and MCP server status. |
 | `--costs` | Show cost analytics: today/week/month spend, per-model breakdown, and token savings from optimizations. |
-| `--live` | Watch the currently running task in real-time. Polls `~/.openkoi/state/current-task.json` every second and displays a progress bar, score, cost, and recent task history. Exit with Ctrl-C. |
+| `--live` | Watch the currently running task in real-time. Polls `~/.openkoi/state/last-task.json` every second and displays a progress bar, score, cost, and recent task history. Exit with Ctrl-C. |
 
 ### Example Output
 
@@ -907,6 +913,161 @@ openkoi export sessions
 ```
 
 The SQLite database at `~/.local/share/openkoi/openkoi.db` is also directly readable by any SQLite client.
+
+---
+
+## `openkoi session [action]`
+
+Manage tracked sessions. Every task and chat interaction creates a session with a unique ID, status, transcript, and cost totals. Session IDs support prefix matching — you only need to type enough characters to uniquely identify the session.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List recent sessions with status, channel, task count, cost |
+| `show <id>` | Show session details, tasks, and transcript info |
+| `resume <id>` | Resume an ended chat session (equivalent to `openkoi chat --resume <id>`) |
+| `delete <id>` | Delete a session and all its data (transcript, task outputs) |
+
+When run without a subcommand, defaults to `list`.
+
+### `openkoi session list`
+
+```
+$ openkoi session list
+
+ID         Channel  Status     Created                Tasks    Tokens     Cost
+--------------------------------------------------------------------------------
+a1b2c3d4   chat     ended      2026-03-09 14:22       3        45200      $0.68
+e5f6a7b8   cli      ended      2026-03-09 10:15       1        12400      $0.19
+c9d0e1f2   daemon   active     2026-03-08 09:00       7        128000     $1.92
+
+3 session(s) shown.
+```
+
+| Flag | Short | Default | Description |
+|------|-------|---------|-------------|
+| `--limit <n>` | `-n` | `20` | Maximum number of sessions to display |
+
+### `openkoi session show <id>`
+
+Shows full details of a session including its tasks, model used, and transcript location. The `<id>` argument supports prefix matching.
+
+```
+$ openkoi session show a1b2
+
+Session: a1b2c3d4-5678-90ab-cdef-1234567890ab
+  Channel:  chat
+  Model:    anthropic/claude-sonnet-4-5
+  Status:   ended
+  Created:  2026-03-09T14:22:00Z
+  Ended:    2026-03-09T14:45:00Z
+  Tokens:   45200
+  Cost:     $0.6800
+
+Tasks (3):
+  e1f2a3b4 | score: 0.91 | Refactor the auth module to use JWT
+  c5d6e7f8 | score: 0.88 | Add rate limiting to API endpoints
+  a9b0c1d2 | score: 0.85 | Fix pagination in user list
+
+Transcript: 24 entries (~/.local/share/openkoi/sessions/a1b2c3d4-.../transcript.jsonl)
+```
+
+### `openkoi session resume <id>`
+
+Resumes an ended chat session. This is equivalent to running `openkoi chat --resume <id>`. The session's transcript is loaded, older messages are compressed into a summary, and the last 10 messages are kept verbatim to provide context continuity.
+
+```bash
+openkoi session resume a1b2
+```
+
+### `openkoi session delete <id>`
+
+Deletes a session from the database and removes its directory on disk (transcript and task output files). Prompts for confirmation unless `--force` is passed.
+
+```
+$ openkoi session delete a1b2
+Delete session a1b2c3d4 (chat, 3 tasks)?
+Pass --force to skip this prompt.
+Continue? [y/N] y
+Session a1b2c3d4 deleted.
+```
+
+| Flag | Description |
+|------|-------------|
+| `--force` | Skip the confirmation prompt |
+
+---
+
+## `openkoi task [action]`
+
+Inspect task history and replay past outputs. Task outputs are persisted to disk as markdown files, making them browsable and pipeable. Task IDs support prefix matching.
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | List recent tasks with score, iterations, cost, and description |
+| `show <id>` | Show task details with output preview |
+| `replay <id>` | Replay full task output to stdout (suitable for piping) |
+
+When run without a subcommand, defaults to `list`.
+
+### `openkoi task list`
+
+```
+$ openkoi task list
+
+ID         Session    Score    Iters    Cost     Description
+----------------------------------------------------------------------------------------
+e1f2a3b4   a1b2c3d4   0.91    3        $0.32    Refactor the auth module to use JWT
+c5d6e7f8   a1b2c3d4   0.88    2        $0.19    Add rate limiting to API endpoints
+a9b0c1d2   e5f6a7b8   0.85    2        $0.17    Fix pagination in user list
+
+3 task(s) shown.
+```
+
+| Flag | Short | Default | Description |
+|------|-------|---------|-------------|
+| `--limit <n>` | `-n` | `20` | Maximum number of tasks to display |
+| `--session <id>` | | _(none)_ | Filter tasks by session ID (prefix match supported) |
+
+### `openkoi task show <id>`
+
+Shows full details of a task including its output. The output is previewed (first 500 characters); use `task replay` for the complete content.
+
+```
+$ openkoi task show e1f2
+
+Task: e1f2a3b4-5678-90ab-cdef-1234567890ab
+  Description: Refactor the auth module to use JWT
+  Category:    code
+  Session:     a1b2c3d4-5678-90ab-cdef-1234567890ab
+  Score:       0.91
+  Iterations:  3
+  Decision:    accept
+  Tokens:      32400
+  Cost:        $0.3200
+  Created:     2026-03-09T14:22:05Z
+  Completed:   2026-03-09T14:23:12Z
+
+Output:
+Here's the refactored auth module using JWT tokens...
+[32400 chars total]
+```
+
+### `openkoi task replay <id>`
+
+Replays the full task output to stdout with no formatting or decoration. This is designed for piping:
+
+```bash
+# Replay to terminal
+openkoi task replay e1f2
+
+# Pipe to a file
+openkoi task replay e1f2 > auth-refactor-output.md
+
+# Pipe to clipboard (macOS)
+openkoi task replay e1f2 | pbcopy
+```
+
+If no output was saved for the task, an error is returned.
 
 ---
 

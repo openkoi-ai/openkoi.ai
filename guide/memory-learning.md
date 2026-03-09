@@ -17,7 +17,9 @@ OpenKoi follows XDG conventions, splitting configuration from data:
 ~/.local/share/openkoi/                  # XDG_DATA_HOME/openkoi
   openkoi.db                             # SQLite (structured data + vectors)
   sessions/
-    <session-id>.jsonl                   # Full transcripts (episodic memory)
+    <session-id>/
+      transcript.jsonl                   # Full transcripts (episodic memory)
+      <task-id>.md                       # Saved task output (per-task)
   skills/
     managed/                             # Installed skills
     proposed/                            # Auto-proposed from pattern mining
@@ -51,8 +53,8 @@ All structured data lives in a single SQLite database (`openkoi.db`). Vector sea
 
 | Table | Purpose | Key Fields |
 |-------|---------|------------|
-| `sessions` | Tracks conversation sessions | `id`, `channel`, `model_provider`, `model_id`, `total_tokens`, `total_cost_usd`, `transcript_path` |
-| `tasks` | Records every task and its outcome | `id`, `description`, `category`, `session_id`, `final_score`, `iterations`, `decision`, `total_tokens`, `total_cost_usd` |
+| `sessions` | Tracks conversation sessions | `id`, `channel`, `model_provider`, `model_id`, `status`, `total_tokens`, `total_cost_usd`, `transcript_path`, `ended_at` |
+| `tasks` | Records every task and its outcome | `id`, `description`, `category`, `session_id`, `final_score`, `iterations`, `decision`, `total_tokens`, `total_cost_usd`, `output_path` |
 | `iteration_cycles` | Per-iteration data within a task | `id`, `task_id`, `iteration`, `score`, `decision`, `input_tokens`, `output_tokens`, `duration_ms` |
 | `findings` | Individual evaluation findings | `id`, `cycle_id`, `severity`, `dimension`, `title`, `description`, `location`, `fix`, `resolved_in` |
 | `learnings` | Extracted knowledge from task outcomes | `id`, `type`, `content`, `category`, `confidence`, `source_task`, `reinforced`, `last_used`, `expires_at` |
@@ -82,8 +84,10 @@ CREATE TABLE sessions (
   channel         TEXT,
   model_provider  TEXT,
   model_id        TEXT,
+  status          TEXT DEFAULT 'active',
   created_at      TEXT NOT NULL,
   updated_at      TEXT NOT NULL,
+  ended_at        TEXT,
   total_tokens    INTEGER DEFAULT 0,
   total_cost_usd  REAL DEFAULT 0.0,
   transcript_path TEXT
@@ -99,6 +103,7 @@ CREATE TABLE tasks (
   decision        TEXT,
   total_tokens    INTEGER,
   total_cost_usd  REAL,
+  output_path     TEXT,
   created_at      TEXT NOT NULL,
   completed_at    TEXT
 );
@@ -197,6 +202,9 @@ CREATE TABLE usage_patterns (
 CREATE INDEX idx_events_day ON usage_events(day);
 CREATE INDEX idx_learnings_type ON learnings(type);
 CREATE INDEX idx_tasks_category ON tasks(category);
+CREATE INDEX idx_sessions_status ON sessions(status);
+CREATE INDEX idx_sessions_created ON sessions(created_at);
+CREATE INDEX idx_tasks_session ON tasks(session_id);
 ```
 
 ## Memory Layers
