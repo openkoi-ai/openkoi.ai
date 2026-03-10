@@ -4,6 +4,15 @@ OpenKoi ships as a single static binary with zero runtime dependencies. No Node.
 
 ## Installation Methods
 
+### Homebrew (Recommended)
+
+```bash
+brew tap openkoi-ai/openkoi
+brew install openkoi
+```
+
+The fastest path on macOS and Linux. Installs a pre-built binary — no compiler needed. Updates via `brew upgrade openkoi`.
+
 ### Cargo (Source Build)
 
 ```bash
