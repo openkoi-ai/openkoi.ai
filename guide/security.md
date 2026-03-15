@@ -389,6 +389,89 @@ If the agent's output contains what appears to be an API key or secret (detected
   The value has been redacted from the display.
 ```
 
+## Sensitive Information Redaction
+
+OpenKoi includes an opt-in redaction preprocessor that scans content for sensitive information (API keys, passwords, private keys, connection strings, etc.) before sending it to AI providers. This is designed for enterprise environments where secrets may appear in code, config files, logs, or tool output that the agent processes.
+
+### How It Works
+
+The redaction lifecycle has three phases:
+
+1. **Scan and redact** -- Before content is sent to the AI provider, the redactor scans it against a library of pattern categories. Detected secrets are replaced with deterministic placeholders like `[REDACTED_API_KEY_1]`.
+2. **AI processes placeholders** -- The provider sees only the placeholders, never the actual secrets. The AI can still reason about the structure (e.g., "this config has an API key") without seeing the value.
+3. **Restore** -- After the AI responds, placeholders in the output are replaced with the original values so the final result shown to the user is correct.
+
+This scan-redact-restore cycle runs at three interception points in the executor pipeline:
+
+| Interception Point | When | What Is Redacted |
+|--------------------|------|-----------------|
+| Before `provider.chat()` | User message + context sent to the AI | Secrets in the prompt, file contents, and conversation history |
+| After response | AI response received | Restores any placeholders the AI echoed back |
+| After tool dispatch | Tool results returned to the agent | Secrets in command output, file reads, search results |
+
+### Built-in Pattern Categories
+
+The redactor ships with 10 categories of patterns. Each category can be individually enabled or disabled.
+
+| Category | Default | Examples |
+|----------|---------|----------|
+| `api_keys` | on | `sk-ant-api03-...`, `AKIA...`, `ghp_...`, `xoxb-...` |
+| `passwords` | on | `password = "..."`, `passwd: ...`, `secret_key = "..."` |
+| `private_keys` | on | `-----BEGIN RSA PRIVATE KEY-----`, `-----BEGIN EC PRIVATE KEY-----` |
+| `connection_strings` | on | `postgres://user:pass@host/db`, `mongodb+srv://...`, `redis://...` |
+| `tokens` | on | `Bearer eyJ...`, JWT tokens, session tokens |
+| `aws_credentials` | on | `aws_access_key_id`, `aws_secret_access_key` values |
+| `ip_addresses` | on | IPv4 and IPv6 addresses |
+| `email_addresses` | on | `user@example.com` patterns |
+| `credit_cards` | on | 16-digit card number patterns (Luhn-validated) |
+| `high_entropy` | **off** | Generic high-entropy strings (potential secrets). Off by default due to false positives. |
+
+### Deterministic Placeholders
+
+The same secret always maps to the same placeholder within a session. If `sk-ant-api03-abc123` appears in three different messages, all three are replaced with `[REDACTED_API_KEY_1]`. A different API key gets `[REDACTED_API_KEY_2]`. This lets the AI maintain referential consistency (e.g., "the key in line 5 is the same one used in line 42").
+
+### Custom Patterns and Literal Secrets
+
+Beyond the built-in categories, you can define custom regex patterns and literal secret values:
+
+```toml
+# Custom regex patterns
+[[redaction.custom_patterns]]
+name = "internal_token"
+pattern = "itk-[a-zA-Z0-9]{32}"
+placeholder_prefix = "INTERNAL_TOKEN"
+
+# Literal secrets (exact string match, no regex)
+[redaction]
+literal_secrets = [
+  "my-company-internal-secret-value",
+  "super-secret-database-password",
+]
+```
+
+### Enabling Redaction
+
+Redaction is **disabled by default**. Enable it in one of two ways:
+
+**CLI flag (per-invocation):**
+
+```bash
+openkoi --redact "Refactor the database module"
+openkoi chat --redact
+```
+
+**Config file (persistent):**
+
+```toml
+# ~/.openkoi/config.toml
+[redaction]
+enabled = true
+```
+
+The CLI flag takes precedence -- `--redact` enables redaction even if the config has `enabled = false`.
+
+See the [Configuration](/guide/configuration) page for the full `[redaction]` config reference.
+
 ## Security Summary
 
 OpenKoi's security model is defense-in-depth. The primary boundary is that the agent runs as you -- it can do anything you can do from a terminal. Everything below that is layered protection:
@@ -400,5 +483,6 @@ OpenKoi's security model is defense-in-depth. The primary boundary is that the a
 5. **Destructive operation detection** adds human confirmation for dangerous commands.
 6. **Credential storage** uses filesystem permissions (the same model as SSH keys).
 7. **Permission auditing** via `openkoi doctor` catches misconfigurations.
+8. **Sensitive information redaction** scans and replaces secrets before they reach AI providers (opt-in).
 
 These are safeguards against accidents, not security against a hostile agent. The design assumes the agent is acting in good faith on behalf of the user, and the guardrails exist to catch the inevitable mistakes that any automated system will make.

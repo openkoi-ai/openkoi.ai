@@ -56,6 +56,7 @@ openkoi --model ollama/llama3.3 "Summarize this file" < README.md
 | `--executor <model>` | | Same as `--model` | Model to use for execution (the "do" step). |
 | `--evaluator <model>` | | Same as `--model` | Model to use for evaluation (the "judge" step). |
 | `--budget <usd>` | | `$2.00` | Maximum cost in USD for this task. The iteration loop hard-stops when the cost limit is reached. |
+| `--redact` | | `false` | Enable sensitive information redaction. Scans and redacts secrets (API keys, passwords, private keys, connection strings) before sending content to AI providers. Secrets are restored in the final output. Can also be enabled persistently via `[redaction]` in config.toml. See the [Security](/guide/security) page for details. |
 | `--verbose` | | `false` | Enable debug-level logging. Shows API requests (truncated), skill selection, recall results, and token counts. |
 
 ### Examples by Complexity Level

@@ -135,6 +135,28 @@ env     = { DATABASE_URL = "postgres://localhost/mydb" }
 compaction          = true   # Enable context compaction for long sessions
 learning_decay_rate = 0.05   # Confidence decay per week for unreinforced learnings
 max_storage_mb      = 500    # Maximum disk usage for the data directory
+
+# ─── Sensitive Information Redaction ─────────────────────────────
+[redaction]
+enabled         = false  # Opt-in: enable with --redact flag or set to true
+literal_secrets = []     # Exact strings to always redact
+
+[redaction.categories]
+api_keys           = true
+passwords          = true
+private_keys       = true
+connection_strings = true
+tokens             = true
+aws_credentials    = true
+ip_addresses       = true
+email_addresses    = true
+credit_cards       = true
+high_entropy       = false  # Off by default (false positives on hashes/UUIDs)
+
+# [[redaction.custom_patterns]]
+# name = "internal_token"
+# pattern = "itk-[a-zA-Z0-9]{32}"
+# placeholder_prefix = "INTERNAL_TOKEN"
 ```
 
 ---
@@ -317,6 +339,63 @@ Controls the persistent local memory system.
 | `learning_decay_rate` | float | `0.05` | Confidence decay rate per week for learnings that are not reinforced. Learnings below 0.1 confidence are pruned. Set to `0.0` to disable decay. |
 | `max_storage_mb` | integer | `500` | Maximum disk usage for the data directory (`~/.local/share/openkoi`). When exceeded, old session transcripts are pruned first. |
 
+### `[redaction]`
+
+Controls the sensitive information redaction preprocessor. When enabled, secrets are scanned, replaced with deterministic placeholders before reaching AI providers, and restored in the final output. Designed for enterprise environments where secrets may appear in code or tool output. See the [Security](/guide/security) page for the full explanation of the scan-redact-restore lifecycle.
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `enabled` | bool | `false` | Enable redaction globally. Can also be enabled per-invocation with `--redact`. |
+| `literal_secrets` | array of strings | `[]` | Exact string values to always redact (no regex, case-sensitive match). |
+
+#### `[redaction.categories]`
+
+Toggle individual pattern categories on or off. All categories default to `true` except `high_entropy`.
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `api_keys` | bool | `true` | API key patterns (Anthropic, AWS, GitHub, Slack, etc.). |
+| `passwords` | bool | `true` | Password fields in config files, env vars, URLs. |
+| `private_keys` | bool | `true` | PEM-encoded private keys (RSA, EC, Ed25519, etc.). |
+| `connection_strings` | bool | `true` | Database and service connection URIs with embedded credentials. |
+| `tokens` | bool | `true` | Bearer tokens, JWTs, session tokens. |
+| `aws_credentials` | bool | `true` | AWS access key IDs and secret access keys. |
+| `ip_addresses` | bool | `true` | IPv4 and IPv6 addresses. |
+| `email_addresses` | bool | `true` | Email address patterns. |
+| `credit_cards` | bool | `true` | 16-digit card numbers (Luhn-validated). |
+| `high_entropy` | bool | `false` | Generic high-entropy strings. Off by default due to false positives on hashes, UUIDs, etc. |
+
+#### `[[redaction.custom_patterns]]`
+
+Define custom regex patterns for project-specific secrets. Each entry is a table with the following fields:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | yes | Human-readable name for this pattern (used in logs). |
+| `pattern` | string | yes | Regex pattern to match. Uses `regex-lite` syntax. |
+| `placeholder_prefix` | string | no | Prefix for the placeholder (e.g., `INTERNAL_TOKEN` produces `[REDACTED_INTERNAL_TOKEN_1]`). Defaults to the uppercase `name`. |
+
+Example:
+
+```toml
+[redaction]
+enabled = true
+literal_secrets = ["my-company-internal-secret"]
+
+[redaction.categories]
+high_entropy = false    # keep off (default)
+ip_addresses = false    # don't redact IPs in this project
+
+[[redaction.custom_patterns]]
+name = "internal_token"
+pattern = "itk-[a-zA-Z0-9]{32}"
+placeholder_prefix = "INTERNAL_TOKEN"
+
+[[redaction.custom_patterns]]
+name = "deploy_key"
+pattern = "deploy-[0-9a-f]{64}"
+```
+
 ---
 
 ## Config File Evolution Rules
@@ -428,4 +507,23 @@ token_budget      = 100000
 
 [safety]
 max_cost_usd = 1.0
+```
+
+### Enterprise redaction
+
+```toml
+[models]
+executor  = "anthropic/claude-sonnet-4-5"
+evaluator = "anthropic/claude-sonnet-4-5"
+
+[redaction]
+enabled = true
+literal_secrets = ["prod-db-password-xyz"]
+
+[redaction.categories]
+high_entropy = false   # keep off to avoid false positives
+
+[[redaction.custom_patterns]]
+name = "internal_token"
+pattern = "itk-[a-zA-Z0-9]{32}"
 ```
